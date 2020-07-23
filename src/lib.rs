@@ -36,12 +36,12 @@ impl<'a> App<'a> {
         }
     }
 
-    pub fn make_code(data: &str) -> QrCode {
+    fn make_code(data: &str) -> QrCode {
         let code = QrCode::new(data.as_bytes()).unwrap();
         code
     }
 
-    pub fn read_code(file: &PathBuf) -> Vec<String> {
+    fn read_code(file: &PathBuf) -> Vec<String> {
         let img = image::open(file).unwrap();
         let decoder = bardecoder::default_decoder();
 

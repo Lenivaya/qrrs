@@ -53,4 +53,26 @@ impl<'a> App<'a> {
 
         unwrapped_results
     }
+
+    fn print_code_to_term(code: QrCode) {
+        // TODO -- Implement this when there are no dependency problems
+        // let image = code
+        //     .render::<unicode::Dense1x2>()
+        //     .dark_color(unicode::Dense1x2::Light)
+        //     .light_color(unicode::Dense1x2::Dark)
+        //     .build();
+
+        let string = code
+            .render::<char>()
+            .quiet_zone(false)
+            .module_dimensions(2, 1)
+            .build();
+
+        println!("\n{}", string);
+    }
+
+    fn save(file: &PathBuf, code: QrCode) {
+        let image = code.render::<Luma<u8>>().build();
+        image.save(file).unwrap();
+    }
 }

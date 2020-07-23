@@ -19,22 +19,20 @@ impl<'a> App<'a> {
     }
 
     pub fn run(self) {
-        match self.config.run_in_browser {
-            true => println!("Running in browser..."),
-            false => match self.config.read {
-                true => {
-                    let file = PathBuf::from_str(self.config.input).unwrap();
-                    let data = App::read_code(&file);
-                    for something in data {
-                        println!("{}", something)
-                    }
-                }
-                false => {
-                    let code = App::make_code(self.config.input);
-                    let image = code.render::<Luma<u8>>().build();
-                    image.save(self.config.output).unwrap();
-                }
-            },
+        let code = App::make_code(self.config.input);
+
+        if self.config.read == true {
+            let file = PathBuf::from_str(self.config.input).unwrap();
+            let data = App::read_code(&file);
+
+            for something in data {
+                println!("{}", something)
+            }
+        } else if self.config.terminal_output == true {
+            App::print_code_to_term(code)
+        } else {
+            let file = PathBuf::from_str(self.config.output).unwrap();
+            App::save(&file, code)
         }
     }
 

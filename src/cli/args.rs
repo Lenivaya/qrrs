@@ -8,6 +8,7 @@ impl<'a> Arguments<'a> {
     pub fn new() -> Arguments<'a> {
         let matches = App::new("qrrs")
             .about("CLI tool for working with qr-codes")
+            .version("0.1.0")
             .arg(
                 Arg::with_name("read")
                     .short("r")

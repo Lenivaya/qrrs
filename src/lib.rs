@@ -76,3 +76,30 @@ impl<'a> App<'a> {
         image.save(file).unwrap();
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::fs;
+
+    #[test]
+    fn make_code() {
+        let text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
+        let file = "qr_tmp.png";
+
+        let config = cli::config::Config {
+            input: text,
+            output: file,
+            read: false,
+            terminal_output: false,
+        };
+        let app = App::new(config);
+        app.run();
+
+        let path = PathBuf::from_str(file).unwrap();
+        let text_from_qr = App::read_code(&path).join(" ");
+        fs::remove_file(file).unwrap();
+
+        assert_eq!(text, text_from_qr);
+    }
+}

@@ -105,6 +105,8 @@ impl<'a> App<'a> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use rand::distributions::Alphanumeric;
+    use rand::{thread_rng, Rng};
     use std::fs;
 
     #[test]
@@ -114,6 +116,28 @@ mod tests {
 
         let config = cli::config::Config {
             input: Some(text),
+            output: Some(file),
+            read: false,
+            terminal_output: false,
+        };
+        let app = App::new(config);
+        app.run();
+
+        let path = PathBuf::from_str(file).unwrap();
+        let text_from_qr = App::read_code(&path).join(" ");
+        fs::remove_file(file).unwrap();
+
+        assert_eq!(text, text_from_qr);
+    }
+
+    #[test]
+    fn make_code_with_random_text() {
+        let text: String =
+            thread_rng().sample_iter(&Alphanumeric).take(30).collect();
+        let file = "qr_tmp_random.png";
+
+        let config = cli::config::Config {
+            input: Some(&text),
             output: Some(file),
             read: false,
             terminal_output: false,

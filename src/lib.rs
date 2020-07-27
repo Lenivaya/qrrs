@@ -84,7 +84,8 @@ impl<'a> App<'a> {
     }
 
     fn read_code(file: &PathBuf) -> Vec<String> {
-        let img = image::open(file).unwrap();
+        let img = image::open(file)
+            .unwrap_or_else(|err| panic!("Problem opening file: {} ", err));
         let decoder = bardecoder::default_decoder();
 
         let results = decoder.decode(&img);
@@ -115,7 +116,9 @@ impl<'a> App<'a> {
 
     fn save(file: &PathBuf, code: QrCode) {
         let image = code.render::<Luma<u8>>().build();
-        image.save(file).unwrap();
+        image
+            .save(file)
+            .unwrap_or_else(|err| panic!("Problem saving code: {}", err));
     }
 }
 

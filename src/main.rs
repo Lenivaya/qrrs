@@ -1,8 +1,9 @@
-use qrrs::{cli, App};
+use qrrs::cli::{args, config};
+use qrrs::App;
 
 fn main() {
-    let args = cli::args::Arguments::new();
-    let config = cli::config::Config::new(&args.matches);
+    let args = args::Arguments::new();
+    let config = config::Config::new(&args.matches);
 
     let app = App::new(config);
     app.run();

@@ -23,14 +23,12 @@ impl<'a> Config<'a> {
         let mut read = false;
         let mut terminal_output = false;
 
-        match matches.occurrences_of("read") {
-            1 => read = true,
-            _ => (),
-        };
+        if matches.is_present("read") {
+            read = true
+        }
 
-        match matches.occurrences_of("terminal") {
-            1 => terminal_output = true,
-            _ => (),
+        if matches.is_present("terminal") {
+            terminal_output = true
         }
 
         Config {

@@ -24,7 +24,8 @@ impl<'a> App<'a> {
             Config {
                 input: Some(i),
                 output: Some(o),
-                ..
+                read: false,
+                terminal_output: false,
             } => {
                 let code = App::make_code(i);
                 let file = PathBuf::from_str(o).unwrap();
@@ -32,10 +33,25 @@ impl<'a> App<'a> {
                 App::save(&file, code)
             }
 
+            // Reads code and shows it in terminal
+            Config {
+                input: Some(i),
+                output: None,
+                read: true,
+                terminal_output: true,
+            } => {
+                let file = PathBuf::from_str(i).unwrap();
+                let data = App::read_code(&file).join(" ");
+
+                let code = App::make_code(&data);
+                App::print_code_to_term(code);
+            }
+
             // Reads qr code
             Config {
                 input: Some(i),
                 read: true,
+                terminal_output: false,
                 ..
             } => {
                 let file = PathBuf::from_str(i).unwrap();
@@ -46,9 +62,10 @@ impl<'a> App<'a> {
                 }
             }
 
-            // Prints code to term
+            // Prints code generated from user input to a terminal
             Config {
                 input: Some(i),
+                read: false,
                 terminal_output: true,
                 ..
             } => {

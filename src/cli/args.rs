@@ -10,13 +10,6 @@ impl<'a> Arguments<'a> {
             .about("CLI tool for working with qr-codes")
             .version("0.1.0")
             .arg(
-                Arg::with_name("read")
-                    .short("r")
-                    .help("Reads the qr-code instead of generating it")
-                    .long("read")
-                    .takes_value(false),
-            )
-            .arg(
                 Arg::with_name("INPUT")
                     .help("Input data")
                     .index(1)
@@ -28,6 +21,13 @@ impl<'a> Arguments<'a> {
                     .index(2)
                     .required_unless("read")
                     .required_unless("terminal"),
+            )
+            .arg(
+                Arg::with_name("read")
+                    .short("r")
+                    .help("Reads the qr-code instead of generating it")
+                    .long("read")
+                    .takes_value(false),
             )
             .arg(
                 Arg::with_name("terminal")

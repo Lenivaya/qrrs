@@ -3,9 +3,9 @@ name = "qrrs"
 version = "0.1.0"
 authors = ["Lenivaya <xocada@gmail.com>"]
 edition = "2018"
-
 description = "CLI QR code generator and reade"
 license = "MIT"
+repository = "https://github.com/Lenivaya/qrrs"
 
 [dependencies]
 qrcode = "0.11"

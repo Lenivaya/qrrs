@@ -2,16 +2,24 @@ use clap::ArgMatches;
 
 #[derive(Debug)]
 pub struct Config<'a> {
-    pub input: &'a str,
-    pub output: &'a str,
+    pub input: Option<&'a str>,
+    pub output: Option<&'a str>,
     pub read: bool,
     pub terminal_output: bool,
 }
 
 impl<'a> Config<'a> {
-    pub fn new(matches: &'a ArgMatches) -> Config<'a> {
-        let input = matches.value_of("INPUT").unwrap_or("");
-        let output = matches.value_of("OUTPUT").unwrap_or("");
+    pub fn new(matches: &'a ArgMatches) -> Self {
+        let input = match matches.value_of("INPUT") {
+            None => None,
+            Some(i) => Some(i),
+        };
+
+        let output = match matches.value_of("OUTPUT") {
+            None => None,
+            Some(o) => Some(o),
+        };
+
         let mut read = false;
         let mut terminal_output = false;
 

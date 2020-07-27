@@ -14,25 +14,50 @@ pub struct App<'a> {
 }
 
 impl<'a> App<'a> {
-    pub fn new(config: Config) -> App {
+    pub fn new(config: Config<'a>) -> Self {
         App { config }
     }
 
     pub fn run(self) {
-        let code = App::make_code(self.config.input);
+        match self.config {
+            // Saves qr code
+            Config {
+                input: Some(i),
+                output: Some(o),
+                ..
+            } => {
+                let code = App::make_code(i);
+                let file = PathBuf::from_str(o).unwrap();
 
-        if self.config.read == true {
-            let file = PathBuf::from_str(self.config.input).unwrap();
-            let data = App::read_code(&file);
-
-            for something in data {
-                println!("{}", something)
+                App::save(&file, code)
             }
-        } else if self.config.terminal_output == true {
-            App::print_code_to_term(code)
-        } else {
-            let file = PathBuf::from_str(self.config.output).unwrap();
-            App::save(&file, code)
+
+            // Reads qr code
+            Config {
+                input: Some(i),
+                read: true,
+                ..
+            } => {
+                let file = PathBuf::from_str(i).unwrap();
+                let data = App::read_code(&file);
+
+                for something in data {
+                    println!("{}", something)
+                }
+            }
+
+            // Prints code to term
+            Config {
+                input: Some(i),
+                terminal_output: true,
+                ..
+            } => {
+                let code = App::make_code(i);
+
+                App::print_code_to_term(code)
+            }
+
+            _ => (),
         }
     }
 
@@ -88,8 +113,8 @@ mod tests {
         let file = "qr_tmp.png";
 
         let config = cli::config::Config {
-            input: text,
-            output: file,
+            input: Some(text),
+            output: Some(file),
             read: false,
             terminal_output: false,
         };

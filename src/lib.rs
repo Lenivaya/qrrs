@@ -79,7 +79,8 @@ impl<'a> App<'a> {
     }
 
     fn make_code(data: &str) -> QrCode {
-        let code = QrCode::new(data.as_bytes()).unwrap();
+        let code = QrCode::new(data.as_bytes())
+            .unwrap_or_else(|err| panic!("Problem creating qr code: {}", err));
         code
     }
 
@@ -91,7 +92,11 @@ impl<'a> App<'a> {
         let results = decoder.decode(&img);
         let unwrapped_results = results
             .into_iter()
-            .map(|result| result.unwrap())
+            .map(|result| {
+                result.unwrap_or_else(|err| {
+                    panic!("Problem reading data from qr code: {}", err)
+                })
+            })
             .collect::<Vec<String>>();
 
         unwrapped_results

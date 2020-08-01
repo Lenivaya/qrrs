@@ -79,14 +79,18 @@ impl<'a> App<'a> {
     }
 
     fn make_code(data: &str) -> QrCode {
-        let code = QrCode::new(data.as_bytes())
-            .unwrap_or_else(|err| panic!("Problem creating qr code: {}", err));
+        let code = QrCode::new(data.as_bytes()).unwrap_or_else(|err| {
+            eprintln!("Problem creating qr code: {}", err);
+            std::process::exit(1);
+        });
         code
     }
 
     fn read_code(file: &PathBuf) -> Vec<String> {
-        let img = image::open(file)
-            .unwrap_or_else(|err| panic!("Problem opening file: {} ", err));
+        let img = image::open(file).unwrap_or_else(|err| {
+            eprintln!("Problem opening file: {} ", err);
+            std::process::exit(1);
+        });
         let decoder = bardecoder::default_decoder();
 
         let results = decoder.decode(&img);
@@ -94,7 +98,8 @@ impl<'a> App<'a> {
             .into_iter()
             .map(|result| {
                 result.unwrap_or_else(|err| {
-                    panic!("Problem reading data from qr code: {}", err)
+                    eprintln!("Problem reading data from qr code: {}", err);
+                    std::process::exit(1);
                 })
             })
             .collect::<Vec<String>>();
@@ -121,9 +126,10 @@ impl<'a> App<'a> {
 
     fn save(file: &PathBuf, code: QrCode) {
         let image = code.render::<Luma<u8>>().build();
-        image
-            .save(file)
-            .unwrap_or_else(|err| panic!("Problem saving code: {}", err));
+        image.save(file).unwrap_or_else(|err| {
+            eprintln!("Problem saving code: {}", err);
+            std::process::exit(1);
+        });
     }
 }
 

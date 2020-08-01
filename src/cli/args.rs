@@ -1,4 +1,5 @@
-use clap::{App, Arg, ArgMatches};
+use clap::{crate_authors, crate_version};
+use clap::{App, AppSettings, Arg, ArgMatches};
 
 pub struct Arguments<'a> {
     pub matches: ArgMatches<'a>,
@@ -8,7 +9,9 @@ impl<'a> Arguments<'a> {
     pub fn new() -> Arguments<'a> {
         let matches = App::new("qrrs")
             .about("CLI tool for working with qr-codes")
-            .version("0.1.0")
+            .version(crate_version!())
+            .author(crate_authors!())
+            .setting(AppSettings::ColoredHelp)
             .arg(
                 Arg::with_name("INPUT")
                     .help("Input data")

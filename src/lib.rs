@@ -189,4 +189,33 @@ mod tests {
 
         assert_eq!(text, text_from_qr);
     }
+
+    #[test]
+    #[should_panic]
+    fn save_in_unsuported_extesion() {
+        use rand::seq::SliceRandom;
+
+        let unsuported_extension = [
+            ".txt", ".svg", ".mp3", ".iso", ".pdf", ".zip", ".html", ".js",
+        ];
+        let random_ext = unsuported_extension
+            .choose(&mut rand::thread_rng())
+            .unwrap();
+
+        let filename = format!("{}{}", "file", random_ext);
+        let path = PathBuf::from_str(&filename).unwrap();
+        let code = App::make_code("QRrs");
+
+        App::save(&path, code);
+    }
+
+    #[test]
+    #[should_panic]
+    fn read_non_existent_file() {
+        let file: String =
+            thread_rng().sample_iter(&Alphanumeric).take(40).collect();
+        let path = PathBuf::from_str(&file).unwrap();
+
+        let _ = App::read_code(&path);
+    }
 }

@@ -2,6 +2,7 @@ pub mod cli;
 
 use cli::config::Config;
 
+use std::panic;
 use std::path::PathBuf;
 use std::str::FromStr;
 
@@ -19,6 +20,10 @@ impl<'a> App<'a> {
     }
 
     pub fn run(self) {
+        panic::set_hook(Box::new(|_| {
+            ();
+        }));
+
         match self.config {
             // Saves qr code
             Config {
@@ -81,15 +86,16 @@ impl<'a> App<'a> {
     fn make_code(data: &str) -> QrCode {
         let code = QrCode::new(data.as_bytes()).unwrap_or_else(|err| {
             eprintln!("Problem creating qr code: {}", err);
-            std::process::exit(1);
+            panic!();
         });
+
         code
     }
 
     fn read_code(file: &PathBuf) -> Vec<String> {
         let img = image::open(file).unwrap_or_else(|err| {
             eprintln!("Problem opening file: {} ", err);
-            std::process::exit(1);
+            panic!();
         });
         let decoder = bardecoder::default_decoder();
 
@@ -99,7 +105,7 @@ impl<'a> App<'a> {
             .map(|result| {
                 result.unwrap_or_else(|err| {
                     eprintln!("Problem reading data from qr code: {}", err);
-                    std::process::exit(1);
+                    panic!();
                 })
             })
             .collect::<Vec<String>>();
@@ -128,7 +134,8 @@ impl<'a> App<'a> {
         let image = code.render::<Luma<u8>>().build();
         image.save(file).unwrap_or_else(|err| {
             eprintln!("Problem saving code: {}", err);
-            std::process::exit(1);
+            std::fs::remove_file(file).unwrap();
+            panic!();
         });
     }
 }

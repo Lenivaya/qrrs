@@ -195,10 +195,10 @@ mod tests {
     fn save_in_unsuported_extesion() {
         use rand::seq::SliceRandom;
 
-        let unsuported_extension = [
+        let unsuported_extensions = [
             ".txt", ".svg", ".mp3", ".iso", ".pdf", ".zip", ".html", ".js",
         ];
-        let random_ext = unsuported_extension
+        let random_ext = unsuported_extensions
             .choose(&mut rand::thread_rng())
             .unwrap();
 

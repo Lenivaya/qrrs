@@ -7,7 +7,7 @@
 
 # Info
 
-<img src="https://user-images.githubusercontent.com/49302467/88573963-3abf6300-d04a-11ea-9eb3-ae440a9dd76b.png" width="40%" height="70%" align="right">
+<img src="https://user-images.githubusercontent.com/49302467/88573963-3abf6300-d04a-11ea-9eb3-ae440a9dd76b.png" width="40%" height="70%" align="right" margin="5%">
 
 QRrs is a command-line utility written in rust for working with qr codes (what actually follows from the name).
 

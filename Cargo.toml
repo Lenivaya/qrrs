@@ -1,11 +1,15 @@
 [package]
 name = "qrrs"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Lenivaya <xocada@gmail.com>"]
-edition = "2018"
 description = "CLI QR code generator and reader"
-license = "MIT"
+homepage = "https://github.com/Lenivaya/qrrs"
 repository = "https://github.com/Lenivaya/qrrs"
+readme = "README.md"
+keywords = ["cli", "qrcode", "qr", "QR"]
+categories = ["command-line-utilities", "encoding"]
+license = "MIT"
+edition = "2018"
 
 [dependencies]
 qrcode = "0.11"

@@ -6,7 +6,7 @@ pub struct Arguments<'a> {
 }
 
 impl<'a> Arguments<'a> {
-    pub fn new() -> Arguments<'a> {
+    pub fn new() -> Self {
         let matches = App::new("qrrs")
             .about("CLI tool for working with qr-codes")
             .version(crate_version!())

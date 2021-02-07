@@ -8,22 +8,24 @@ jobs:
       matrix:
         platform: [ubuntu-latest, macos-latest, windows-latest]
     runs-on: ${{ matrix.platform }}
+
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
           profile: minimal
           override: true
           components: rustfmt, clippy
+
       - name: Build
-        run: cargo build --release --locked
-      - name: Upload binaries to release
-        uses: actions/upload-artifact@v2
-        with:
-          name: ${{ matrix.asset_name }}-{{matrix.os}}-{{matrix.platform}}
-          path: target/release/${{ matrix.artifact_name }}
-      - name: Dump matrix context
-        env:
-          MATRIX_CONTEXT: ${{ toJson(matrix) }}
-        run: echo "$MATRIX_CONTEXT"
+        run: cargo build --release --verbose --all --locked
+
+      - name: Test
+        run: cargo test --verbose --all
+
+      - name: Clippy
+        run: cargo clippy --all-targets --all-features
+
+      - name: Format
+        run: cargo fmt -- --check

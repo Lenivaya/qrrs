@@ -19,13 +19,26 @@ jobs:
           components: rustfmt, clippy
 
       - name: Build
-        run: cargo build --release --verbose --all --locked
+        run: cargo build --verbose --all --locked
 
       - name: Test
         run: cargo test --verbose --all
 
-      - name: Clippy
-        run: cargo clippy --all-targets --all-features
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+            toolchain: nightly
+            components: rustfmt, clippy
+            override: true
 
-      - name: Format
-        run: cargo fmt -- --check
+      - uses: actions-rs/clippy-check@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          args: --all-features
+
+      - uses: mbrobbel/rustfmt-check@master
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}

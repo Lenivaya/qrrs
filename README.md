@@ -2,7 +2,7 @@
 
 <p align="center">CLI QR code generator and reader written in rust</p>
 
-[![Build Status](https://travis-ci.com/Lenivaya/qrrs.svg?branch=master)](https://travis-ci.com/Lenivaya/qrrs)
+![CI](https://github.com/Lenivaya/qrrs/workflows/CI/badge.svg)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
 
 # Info

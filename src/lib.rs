@@ -223,4 +223,36 @@ mod tests {
 
         let _ = App::read_code(&path);
     }
+
+
+    #[test]
+    fn different_languages_support() {
+        let hellos = [
+            "Dobrý den",
+            "नमस्ते",
+            "こんにちは",
+            "안녕하세요",
+            "Здравствуйте",
+        ];
+        let file = "qr_tmp.png";
+
+        for hello in hellos.iter() {
+            let config = cli::Config {
+                input: Some(hello),
+                output: Some(file),
+                read: false,
+                terminal_output: false,
+            };
+            let app = App::new(config);
+            app.run();
+
+            let path = Path::new(file);
+            let hello_from_qr = App::read_code(&path).join(" ");
+
+            assert_eq!(*hello, hello_from_qr);
+        }
+
+        fs::remove_file(file).unwrap();
+    }
+
 }

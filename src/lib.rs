@@ -6,8 +6,8 @@ use std::panic;
 use std::path::Path;
 
 use image::Luma;
-use qrcode::QrCode;
 use qrcode::render::unicode;
+use qrcode::QrCode;
 use rqrr::PreparedImage;
 
 pub struct App<'a> {
@@ -224,7 +224,6 @@ mod tests {
         let _ = App::read_code(&path);
     }
 
-
     #[test]
     fn different_languages_support() {
         let hellos = [
@@ -254,5 +253,4 @@ mod tests {
 
         fs::remove_file(file).unwrap();
     }
-
 }

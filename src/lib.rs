@@ -7,6 +7,7 @@ use std::path::Path;
 
 use image::Luma;
 use qrcode::QrCode;
+use qrcode::render::unicode;
 use rqrr::PreparedImage;
 
 pub struct App<'a> {
@@ -114,20 +115,19 @@ impl<'a> App<'a> {
     }
 
     fn print_code_to_term(code: QrCode) {
-        // TODO -- Implement this when there are no dependency problems
-        // let image = code
-        //     .render::<unicode::Dense1x2>()
-        //     .dark_color(unicode::Dense1x2::Light)
-        //     .light_color(unicode::Dense1x2::Dark)
-        //     .build();
-
-        let string = code
-            .render::<char>()
-            .quiet_zone(false)
-            .module_dimensions(2, 1)
+        let image = code
+            .render::<unicode::Dense1x2>()
+            .dark_color(unicode::Dense1x2::Light)
+            .light_color(unicode::Dense1x2::Dark)
             .build();
 
-        println!("\n{}", string);
+        // let string = code
+        //     .render::<char>()
+        //     .quiet_zone(false)
+        //     .module_dimensions(2, 1)
+        //     .build();
+
+        println!("\n{}", image);
     }
 
     fn save(file: &Path, code: QrCode) {

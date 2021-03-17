@@ -7,6 +7,7 @@ use std::path::Path;
 
 use image::Luma;
 use qrcode::QrCode;
+use rqrr::PreparedImage;
 
 pub struct App<'a> {
     config: Config<'a>,
@@ -90,21 +91,24 @@ impl<'a> App<'a> {
     }
 
     fn read_code(file: &Path) -> Vec<String> {
-        let img = image::open(file).unwrap_or_else(|err| {
-            eprintln!("Problem opening file: {} ", err);
-            panic!();
-        });
-        let decoder = bardecoder::default_decoder();
+        let img = image::open(file)
+            .unwrap_or_else(|err| {
+                eprintln!("Problem opening file: {} ", err);
+                panic!();
+            })
+            .to_luma8();
+        let mut img = PreparedImage::prepare(img);
+        let grids = img.detect_grids();
 
-        let results = decoder.decode(&img);
-
-        results
+        grids
             .into_iter()
-            .map(|result| {
-                result.unwrap_or_else(|err| {
+            .map(|grid| {
+                let (_, content) = grid.decode().unwrap_or_else(|err| {
                     eprintln!("Problem reading data from qr code: {}", err);
                     panic!();
-                })
+                });
+
+                content
             })
             .collect::<Vec<String>>()
     }

@@ -12,9 +12,9 @@ license = "MIT"
 edition = "2018"
 
 [dependencies]
-qrcode = "0.11"
-bardecoder = "0.2.2"
-image = "0.22"
+qrcode = "0.12.0"
+rqrr = "0.3.2"
+image = "0.23"
 clap = "2.33"
 
 [dev-dependencies]

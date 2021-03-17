@@ -166,43 +166,44 @@ mod tests {
 
     #[test]
     fn make_code_with_random_text() {
-        let text: String =
-            thread_rng().sample_iter(&Alphanumeric).take(30).collect();
-        let file = "qr_tmp_random.png";
+        for _ in 0..10 {
+            let text: String =
+                thread_rng().sample_iter(&Alphanumeric).take(30).collect();
+            let file = "qr_tmp_random.png";
 
-        let config = cli::Config {
-            input: Some(&text),
-            output: Some(file),
-            read: false,
-            terminal_output: false,
-        };
-        let app = App::new(config);
-        app.run();
+            let config = cli::Config {
+                input: Some(&text),
+                output: Some(file),
+                read: false,
+                terminal_output: false,
+            };
+            let app = App::new(config);
+            app.run();
 
-        let path = Path::new(file);
-        let text_from_qr = App::read_code(&path).join(" ");
-        fs::remove_file(file).unwrap();
+            let path = Path::new(file);
+            let text_from_qr = App::read_code(&path).join(" ");
+            fs::remove_file(file).unwrap();
 
-        assert_eq!(text, text_from_qr);
+            assert_eq!(text, text_from_qr);
+        }
     }
 
     #[test]
-    #[should_panic]
     fn save_in_unsuported_extesion() {
-        use rand::seq::SliceRandom;
-
         let unsuported_extensions = [
             ".txt", ".svg", ".mp3", ".iso", ".pdf", ".zip", ".html", ".js",
         ];
-        let random_ext = unsuported_extensions
-            .choose(&mut rand::thread_rng())
-            .unwrap();
 
-        let filename = format!("{}{}", "file", random_ext);
-        let path = Path::new(&filename);
-        let code = App::make_code("QRrs");
+        for ext in &unsuported_extensions {
+            let res = panic::catch_unwind(|| {
+                let filename = format!("{}{}", "file", ext);
+                let path = Path::new(&filename);
+                let code = App::make_code("QRrs");
 
-        App::save(&path, code);
+                App::save(&path, code);
+            });
+            assert!(res.is_err());
+        }
     }
 
     #[test]

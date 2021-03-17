@@ -1,6 +1,14 @@
 use clap::{crate_authors, crate_version};
 use clap::{App, AppSettings, Arg, ArgMatches};
 
+#[derive(Debug)]
+pub struct Config<'a> {
+    pub input: Option<&'a str>,
+    pub output: Option<&'a str>,
+    pub read: bool,
+    pub terminal_output: bool,
+}
+
 pub struct Arguments<'a> {
     pub matches: ArgMatches<'a>,
 }
@@ -42,5 +50,13 @@ impl<'a> Arguments<'a> {
             .get_matches();
 
         Arguments { matches }
+    }
+    pub fn get_config(&'a self) -> Config<'a> {
+        Config {
+            input: self.matches.value_of("INPUT"),
+            output: self.matches.value_of("OUTPUT"),
+            read: self.matches.is_present("read"),
+            terminal_output: self.matches.is_present("terminal"),
+        }
     }
 }

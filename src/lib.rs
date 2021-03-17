@@ -167,8 +167,11 @@ mod tests {
     #[test]
     fn make_code_with_random_text() {
         for _ in 0..10 {
-            let text: String =
-                thread_rng().sample_iter(&Alphanumeric).take(30).collect();
+            let text: String = thread_rng()
+                .sample_iter(&Alphanumeric)
+                .take(30)
+                .map(char::from)
+                .collect();
             let file = "qr_tmp_random.png";
 
             let config = cli::Config {
@@ -190,14 +193,12 @@ mod tests {
 
     #[test]
     fn save_in_unsuported_extesion() {
-        let unsuported_extensions = [
-            ".txt", ".svg", ".mp3", ".iso", ".pdf", ".zip", ".html", ".js",
-        ];
+        let unsuported_extensions =
+            ["txt", "svg", "mp3", "iso", "pdf", "zip", "html", "js"];
 
         for ext in &unsuported_extensions {
             let res = panic::catch_unwind(|| {
-                let filename = format!("{}{}", "file", ext);
-                let path = Path::new(&filename);
+                let path = Path::new("file").with_extension(ext);
                 let code = App::make_code("QRrs");
 
                 App::save(&path, code);
@@ -209,8 +210,11 @@ mod tests {
     #[test]
     #[should_panic]
     fn read_non_existent_file() {
-        let file: String =
-            thread_rng().sample_iter(&Alphanumeric).take(40).collect();
+        let file: String = thread_rng()
+            .sample_iter(&Alphanumeric)
+            .take(40)
+            .map(char::from)
+            .collect();
         let path = Path::new(&file);
 
         let _ = App::read_code(&path);

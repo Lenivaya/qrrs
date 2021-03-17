@@ -18,4 +18,4 @@ image = "0.22"
 clap = "2.33"
 
 [dev-dependencies]
-rand = "0.7"
+rand = "0.8.3"

@@ -6,7 +6,9 @@ use std::panic;
 use std::path::Path;
 
 use image::Luma;
+use qrcode::render::unicode;
 use qrcode::QrCode;
+use rqrr::PreparedImage;
 
 pub struct App<'a> {
     config: Config<'a>,
@@ -90,40 +92,42 @@ impl<'a> App<'a> {
     }
 
     fn read_code(file: &Path) -> Vec<String> {
-        let img = image::open(file).unwrap_or_else(|err| {
-            eprintln!("Problem opening file: {} ", err);
-            panic!();
-        });
-        let decoder = bardecoder::default_decoder();
+        let img = image::open(file)
+            .unwrap_or_else(|err| {
+                eprintln!("Problem opening file: {} ", err);
+                panic!();
+            })
+            .to_luma8();
+        let mut img = PreparedImage::prepare(img);
+        let grids = img.detect_grids();
 
-        let results = decoder.decode(&img);
-
-        results
+        grids
             .into_iter()
-            .map(|result| {
-                result.unwrap_or_else(|err| {
+            .map(|grid| {
+                let (_, content) = grid.decode().unwrap_or_else(|err| {
                     eprintln!("Problem reading data from qr code: {}", err);
                     panic!();
-                })
+                });
+
+                content
             })
             .collect::<Vec<String>>()
     }
 
     fn print_code_to_term(code: QrCode) {
-        // TODO -- Implement this when there are no dependency problems
-        // let image = code
-        //     .render::<unicode::Dense1x2>()
-        //     .dark_color(unicode::Dense1x2::Light)
-        //     .light_color(unicode::Dense1x2::Dark)
-        //     .build();
-
-        let string = code
-            .render::<char>()
-            .quiet_zone(false)
-            .module_dimensions(2, 1)
+        let image = code
+            .render::<unicode::Dense1x2>()
+            .dark_color(unicode::Dense1x2::Light)
+            .light_color(unicode::Dense1x2::Dark)
             .build();
 
-        println!("\n{}", string);
+        // let string = code
+        //     .render::<char>()
+        //     .quiet_zone(false)
+        //     .module_dimensions(2, 1)
+        //     .build();
+
+        println!("\n{}", image);
     }
 
     fn save(file: &Path, code: QrCode) {
@@ -146,10 +150,10 @@ mod tests {
     #[test]
     fn make_code() {
         let text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
-        let file = "qr_tmp.png";
+        let file = "qr_tmp_lorem.png";
 
         let config = cli::Config {
-            input: Some(text),
+            input: Some(&text),
             output: Some(file),
             read: false,
             terminal_output: false,
@@ -218,5 +222,35 @@ mod tests {
         let path = Path::new(&file);
 
         let _ = App::read_code(&path);
+    }
+
+    #[test]
+    fn different_languages_support() {
+        let hellos = [
+            "Dobrý den",
+            "नमस्ते",
+            "こんにちは",
+            "안녕하세요",
+            "Здравствуйте",
+        ];
+        let file = "qr_tmp.png";
+
+        for hello in hellos.iter() {
+            let config = cli::Config {
+                input: Some(hello),
+                output: Some(file),
+                read: false,
+                terminal_output: false,
+            };
+            let app = App::new(config);
+            app.run();
+
+            let path = Path::new(file);
+            let hello_from_qr = App::read_code(&path).join(" ");
+
+            assert_eq!(*hello, hello_from_qr);
+        }
+
+        fs::remove_file(file).unwrap();
     }
 }

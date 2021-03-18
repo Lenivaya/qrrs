@@ -92,6 +92,14 @@ impl<'a> App<'a> {
     }
 
     fn read_code(file: &Path) -> Vec<String> {
+        if !file.exists() {
+            eprintln!(
+                "Error opening file: {:?} \nNo such file or directory",
+                file
+            );
+            panic!();
+        }
+
         let img = image::open(file)
             .unwrap_or_else(|err| {
                 eprintln!("Problem opening file: {} ", err);

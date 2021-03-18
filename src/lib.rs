@@ -51,6 +51,26 @@ impl<'a> App<'a> {
                 App::print_code_to_term(&code);
             }
 
+            // Reads qr code, also saves it into specified output
+            Config {
+                input: Some(i),
+                output: Some(o),
+                read: true,
+                terminal_output: false,
+            } => {
+                let input = Path::new(i);
+                let output = Path::new(o);
+                let data = App::read_code(&input);
+
+                for something in data.iter() {
+                    println!("{}", something)
+                }
+
+                let data_to_write = data.join("");
+                let code = App::make_code(&data_to_write);
+                App::save(&output, &code)
+            }
+
             // Reads qr code
             Config {
                 input: Some(i),
@@ -64,6 +84,20 @@ impl<'a> App<'a> {
                 for something in data {
                     println!("{}", something)
                 }
+            }
+
+            // Prints code generated from user input to a terminal, also saves it into specified output
+            Config {
+                input: Some(i),
+                output: Some(o),
+                read: false,
+                terminal_output: true,
+            } => {
+                let code = App::make_code(i);
+                let file = Path::new(o);
+
+                App::print_code_to_term(&code);
+                App::save(&file, &code);
             }
 
             // Prints code generated from user input to a terminal

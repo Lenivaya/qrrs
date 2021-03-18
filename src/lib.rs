@@ -91,7 +91,7 @@ impl<'a> App<'a> {
                 let datapointer = data.clone();
 
                 let print_handle = thread::spawn(move || {
-                    for something in data.clone().iter() {
+                    for something in data.iter() {
                         println!("{}", something)
                     }
                 });
@@ -132,7 +132,7 @@ impl<'a> App<'a> {
                 let codepointer = code.clone();
 
                 let print_handle = thread::spawn(move || {
-                    App::print_code_to_term(&code.clone());
+                    App::print_code_to_term(&code);
                 });
 
                 App::save(&output, &codepointer);

@@ -1,19 +1,11 @@
-{ pkgs ? import <nixpkgs> {
-  overlays = [
-    (import (builtins.fetchTarball
-      "https://github.com/mozilla/nixpkgs-mozilla/archive/master.tar.gz"))
-  ];
-} }:
+{ pkgs ? import <nixpkgs> { } }:
 
 with pkgs;
 
-let
-  toolchain = with pkgs.rustChannels.stable;
-    (rust.override { extensions = [ "rust-src" ]; });
-in mkShell {
+mkShell {
   name = "qrrs";
-  buildInputs = [ toolchain rustfmt rls pkg-config ];
+  buildInputs = [ cargo rustc glibc pkg-config rustfmt ];
 
   RUST_BACKTRACE = 1;
-
+  RUST_SRC_PATH = "${pkgs.rust.packages.stable.rustPlatform.rustLibSrc}";
 }

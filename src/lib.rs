@@ -34,7 +34,7 @@ impl<'a> App<'a> {
                 let code = App::make_code(i);
                 let file = Path::new(o);
 
-                App::save(&file, code)
+                App::save(&file, &code)
             }
 
             // Reads code and shows it in terminal
@@ -48,7 +48,7 @@ impl<'a> App<'a> {
                 let data = App::read_code(&file).join(" ");
 
                 let code = App::make_code(&data);
-                App::print_code_to_term(code);
+                App::print_code_to_term(&code);
             }
 
             // Reads qr code
@@ -75,7 +75,7 @@ impl<'a> App<'a> {
             } => {
                 let code = App::make_code(i);
 
-                App::print_code_to_term(code)
+                App::print_code_to_term(&code)
             }
 
             _ => (),
@@ -122,7 +122,7 @@ impl<'a> App<'a> {
             .collect::<Vec<String>>()
     }
 
-    fn print_code_to_term(code: QrCode) {
+    fn print_code_to_term(code: &QrCode) {
         let image = code
             .render::<unicode::Dense1x2>()
             .dark_color(unicode::Dense1x2::Light)
@@ -132,7 +132,7 @@ impl<'a> App<'a> {
         println!("\n{}", image);
     }
 
-    fn save(file: &Path, code: QrCode) {
+    fn save(file: &Path, code: &QrCode) {
         let image = code.render::<Luma<u8>>().build();
         image.save(file).unwrap_or_else(|err| {
             eprintln!("Problem saving code: {}", err);
@@ -207,7 +207,7 @@ mod tests {
                 let path = Path::new("file").with_extension(ext);
                 let code = App::make_code("QRrs");
 
-                App::save(&path, code);
+                App::save(&path, &code);
             });
             assert!(res.is_err());
         }

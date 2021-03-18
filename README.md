@@ -54,6 +54,20 @@ $ qrrs --read --terminal /tmp/qr.png
 $ qrrs --read --terminal /tmp/qr.png >> code.txt
 ```
 
+## More advanced commands
+
+Using read and terminal flags together with output specified, as a result shows the QrCode in terminal and copies it to new file.
+
+```console
+$ qrrs --read --terminal /tmp/qr.png /tmp/qr1.png
+```
+
+Almost the same result will be without terminal flag, but now instead of QrCode printed in terminal we will see text from it.
+
+```console
+$ qrrs --read /tmp/qr.png /tmp/qr1.png
+```
+
 ## Install
 
 ### From crates.io

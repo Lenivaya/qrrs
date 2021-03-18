@@ -121,12 +121,6 @@ impl<'a> App<'a> {
             .light_color(unicode::Dense1x2::Dark)
             .build();
 
-        // let string = code
-        //     .render::<char>()
-        //     .quiet_zone(false)
-        //     .module_dimensions(2, 1)
-        //     .build();
-
         println!("\n{}", image);
     }
 

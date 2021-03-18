@@ -4,6 +4,8 @@ use cli::Config;
 
 use std::panic;
 use std::path::Path;
+use std::sync::Arc;
+use std::thread;
 
 use image::Luma;
 use qrcode::render::unicode;
@@ -51,7 +53,31 @@ impl<'a> App<'a> {
                 App::print_code_to_term(&code);
             }
 
-            // Reads qr code, also saves it into specified output
+            // Reads code and shows it in terminal,
+            // also saves to specified output
+            Config {
+                input: Some(i),
+                output: Some(o),
+                read: true,
+                terminal_output: true,
+            } => {
+                let file = Path::new(i);
+                let output = Path::new(o);
+                let data = App::read_code(&file).join(" ");
+
+                let code = Arc::new(App::make_code(&data));
+                let codepointer = code.clone();
+
+                let print_handle = thread::spawn(move || {
+                    App::print_code_to_term(&code);
+                });
+
+                App::save(&output, &codepointer);
+
+                print_handle.join().unwrap();
+            }
+
+            // Reads qr code, also saves it to specified output
             Config {
                 input: Some(i),
                 output: Some(o),
@@ -60,15 +86,21 @@ impl<'a> App<'a> {
             } => {
                 let input = Path::new(i);
                 let output = Path::new(o);
-                let data = App::read_code(&input);
 
-                for something in data.iter() {
-                    println!("{}", something)
-                }
+                let data = Arc::new(App::read_code(&input));
+                let datapointer = data.clone();
 
-                let data_to_write = data.join("");
+                let print_handle = thread::spawn(move || {
+                    for something in data.clone().iter() {
+                        println!("{}", something)
+                    }
+                });
+
+                let data_to_write = datapointer.join("");
                 let code = App::make_code(&data_to_write);
-                App::save(&output, &code)
+                App::save(&output, &code);
+
+                print_handle.join().unwrap();
             }
 
             // Reads qr code
@@ -86,18 +118,26 @@ impl<'a> App<'a> {
                 }
             }
 
-            // Prints code generated from user input to a terminal, also saves it into specified output
+            // Prints code generated from user input to a terminal,
+            // also saves it to specified output
             Config {
                 input: Some(i),
                 output: Some(o),
                 read: false,
                 terminal_output: true,
             } => {
-                let code = App::make_code(i);
-                let file = Path::new(o);
+                let output = Path::new(o);
 
-                App::print_code_to_term(&code);
-                App::save(&file, &code);
+                let code = Arc::new(App::make_code(i));
+                let codepointer = code.clone();
+
+                let print_handle = thread::spawn(move || {
+                    App::print_code_to_term(&code.clone());
+                });
+
+                App::save(&output, &codepointer);
+
+                print_handle.join().unwrap();
             }
 
             // Prints code generated from user input to a terminal
@@ -112,7 +152,7 @@ impl<'a> App<'a> {
                 App::print_code_to_term(&code)
             }
 
-            _ => (),
+            _ => unreachable!(),
         }
     }
 

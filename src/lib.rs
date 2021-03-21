@@ -176,7 +176,7 @@ impl<'a> App<'a> {
 
     pub fn make_code(data: &str) -> QrCode {
         let code = QrCode::new(data.as_bytes()).unwrap_or_else(|err| {
-            eprintln!("Problem creating qr code: {}", err);
+            eprintln!("Error creating qr code: {}", err);
             panic!();
         });
 
@@ -194,7 +194,7 @@ impl<'a> App<'a> {
 
         let img = image::open(file)
             .unwrap_or_else(|err| {
-                eprintln!("Problem opening file: {} ", err);
+                eprintln!("Error opening file: {:?} \n{} ", file, err);
                 panic!();
             })
             .to_luma8();
@@ -205,7 +205,7 @@ impl<'a> App<'a> {
             .into_iter()
             .map(|grid| {
                 let (_, content) = grid.decode().unwrap_or_else(|err| {
-                    eprintln!("Problem reading data from qr code: {}", err);
+                    eprintln!("Error reading data from qr code: {}", err);
                     panic!();
                 });
 
@@ -226,8 +226,12 @@ impl<'a> App<'a> {
 
     pub fn save(file: &Path, code: &QrCode) {
         let image = code.render::<Luma<u8>>().build();
+
         image.save(file).unwrap_or_else(|err| {
-            eprintln!("Problem saving code: {}", err);
+            eprintln!(
+                "Error saving code to {:?}: \n{}",
+                file, err
+            );
             std::fs::remove_file(file).unwrap();
             panic!();
         });

@@ -16,11 +16,8 @@ pub struct App<'a> {
     config: Config<'a>,
 }
 
+// Methods
 impl<'a> App<'a> {
-    pub fn new(config: Config<'a>) -> Self {
-        App { config }
-    }
-
     pub fn run(self) {
         // Removing output(especially backtrace) when invoking panic
         panic::set_hook(Box::new(|_| {}));
@@ -32,12 +29,7 @@ impl<'a> App<'a> {
                 output: Some(o),
                 read: false,
                 terminal_output: false,
-            } => {
-                let code = App::make_code(i);
-                let file = Path::new(o);
-
-                App::save(&file, &code)
-            }
+            } => self.save_code(i, o),
 
             // Reads code and shows it in terminal
             Config {
@@ -45,13 +37,7 @@ impl<'a> App<'a> {
                 output: None,
                 read: true,
                 terminal_output: true,
-            } => {
-                let file = Path::new(i);
-                let data = App::read_code(&file).join(" ");
-
-                let code = App::make_code(&data);
-                App::print_code_to_term(&code);
-            }
+            } => self.print_code(i),
 
             // Reads code and shows it in terminal,
             // also saves to specified output
@@ -60,22 +46,7 @@ impl<'a> App<'a> {
                 output: Some(o),
                 read: true,
                 terminal_output: true,
-            } => {
-                let file = Path::new(i);
-                let output = Path::new(o);
-                let data = App::read_code(&file).join(" ");
-
-                let code = Arc::new(App::make_code(&data));
-                let codepointer = code.clone();
-
-                let print_handle = thread::spawn(move || {
-                    App::print_code_to_term(&code);
-                });
-
-                App::save(&output, &codepointer);
-
-                print_handle.join().unwrap();
-            }
+            } => self.save_print_code(i, o),
 
             // Reads qr code, also saves it to specified output
             Config {
@@ -83,25 +54,7 @@ impl<'a> App<'a> {
                 output: Some(o),
                 read: true,
                 terminal_output: false,
-            } => {
-                let input = Path::new(i);
-                let output = Path::new(o);
-
-                let data = Arc::new(App::read_code(&input));
-                let datapointer = data.clone();
-
-                let print_handle = thread::spawn(move || {
-                    for something in data.iter() {
-                        println!("{}", something)
-                    }
-                });
-
-                let data_to_write = datapointer.join("");
-                let code = App::make_code(&data_to_write);
-                App::save(&output, &code);
-
-                print_handle.join().unwrap();
-            }
+            } => self.save_read_code(i, o),
 
             // Reads qr code
             Config {
@@ -109,14 +62,7 @@ impl<'a> App<'a> {
                 read: true,
                 terminal_output: false,
                 ..
-            } => {
-                let file = Path::new(i);
-                let data = App::read_code(&file);
-
-                for something in data {
-                    println!("{}", something)
-                }
-            }
+            } => self.read_code(i),
 
             // Prints code generated from user input to a terminal,
             // also saves it to specified output
@@ -125,20 +71,7 @@ impl<'a> App<'a> {
                 output: Some(o),
                 read: false,
                 terminal_output: true,
-            } => {
-                let output = Path::new(o);
-
-                let code = Arc::new(App::make_code(i));
-                let codepointer = code.clone();
-
-                let print_handle = thread::spawn(move || {
-                    App::print_code_to_term(&code);
-                });
-
-                App::save(&output, &codepointer);
-
-                print_handle.join().unwrap();
-            }
+            } => self.save_gen_print_code(i, o),
 
             // Prints code generated from user input to a terminal
             Config {
@@ -146,17 +79,102 @@ impl<'a> App<'a> {
                 read: false,
                 terminal_output: true,
                 ..
-            } => {
-                let code = App::make_code(i);
-
-                App::print_code_to_term(&code)
-            }
+            } => self.gen_print_code(i),
 
             _ => unreachable!(),
         }
     }
 
-    fn make_code(data: &str) -> QrCode {
+    fn save_code(&self, input: &str, output: &str) {
+        let code = App::make_code(input);
+        let file = Path::new(output);
+
+        App::save(&file, &code)
+    }
+
+    fn read_code(&self, input: &str) {
+        let file = Path::new(input);
+        let data = App::read(&file);
+
+        for something in data {
+            println!("{}", something)
+        }
+    }
+
+    fn print_code(&self, input: &str) {
+        let file = Path::new(input);
+        let data = App::read(&file).join(" ");
+
+        let code = App::make_code(&data);
+        App::print_code_to_term(&code);
+    }
+
+    fn gen_print_code(&self, input: &str) {
+        let code = App::make_code(input);
+
+        App::print_code_to_term(&code)
+    }
+
+    fn save_print_code(&self, input: &str, output: &str) {
+        let file = Path::new(input);
+        let output = Path::new(output);
+        let data = App::read(&file).join(" ");
+
+        let code = Arc::new(App::make_code(&data));
+        let codepointer = code.clone();
+
+        let print_handle = thread::spawn(move || {
+            App::print_code_to_term(&code);
+        });
+
+        App::save(&output, &codepointer);
+
+        print_handle.join().unwrap();
+    }
+
+    fn save_read_code(&self, input: &str, output: &str) {
+        let input = Path::new(input);
+        let output = Path::new(output);
+
+        let data = Arc::new(App::read(&input));
+        let datapointer = data.clone();
+
+        let print_handle = thread::spawn(move || {
+            for something in data.iter() {
+                println!("{}", something)
+            }
+        });
+
+        let data_to_write = datapointer.join("");
+        let code = App::make_code(&data_to_write);
+        App::save(&output, &code);
+
+        print_handle.join().unwrap();
+    }
+
+    fn save_gen_print_code(&self, input: &str, output: &str) {
+        let output = Path::new(output);
+
+        let code = Arc::new(App::make_code(input));
+        let codepointer = code.clone();
+
+        let print_handle = thread::spawn(move || {
+            App::print_code_to_term(&code);
+        });
+
+        App::save(&output, &codepointer);
+
+        print_handle.join().unwrap();
+    }
+}
+
+// Associated functions
+impl<'a> App<'a> {
+    pub fn new(config: Config<'a>) -> Self {
+        App { config }
+    }
+
+    pub fn make_code(data: &str) -> QrCode {
         let code = QrCode::new(data.as_bytes()).unwrap_or_else(|err| {
             eprintln!("Problem creating qr code: {}", err);
             panic!();
@@ -165,7 +183,7 @@ impl<'a> App<'a> {
         code
     }
 
-    fn read_code(file: &Path) -> Vec<String> {
+    pub fn read(file: &Path) -> Vec<String> {
         if !file.exists() {
             eprintln!(
                 "Error opening file: {:?} \nNo such file or directory",
@@ -196,7 +214,7 @@ impl<'a> App<'a> {
             .collect::<Vec<String>>()
     }
 
-    fn print_code_to_term(code: &QrCode) {
+    pub fn print_code_to_term(code: &QrCode) {
         let image = code
             .render::<unicode::Dense1x2>()
             .dark_color(unicode::Dense1x2::Light)
@@ -206,127 +224,12 @@ impl<'a> App<'a> {
         println!("\n{}", image);
     }
 
-    fn save(file: &Path, code: &QrCode) {
+    pub fn save(file: &Path, code: &QrCode) {
         let image = code.render::<Luma<u8>>().build();
         image.save(file).unwrap_or_else(|err| {
             eprintln!("Problem saving code: {}", err);
             std::fs::remove_file(file).unwrap();
             panic!();
         });
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use rand::distributions::Alphanumeric;
-    use rand::{thread_rng, Rng};
-    use std::fs;
-
-    #[test]
-    fn make_code() {
-        let text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
-        let file = "qr_tmp_lorem.png";
-
-        let config = cli::Config {
-            input: Some(&text),
-            output: Some(file),
-            read: false,
-            terminal_output: false,
-        };
-        let app = App::new(config);
-        app.run();
-
-        let path = Path::new(file);
-        let text_from_qr = App::read_code(&path).join(" ");
-        fs::remove_file(file).unwrap();
-
-        assert_eq!(text, text_from_qr);
-    }
-
-    #[test]
-    fn make_code_with_random_text() {
-        for _ in 0..10 {
-            let text: String = thread_rng()
-                .sample_iter(&Alphanumeric)
-                .take(30)
-                .map(char::from)
-                .collect();
-            let file = "qr_tmp_random.png";
-
-            let config = cli::Config {
-                input: Some(&text),
-                output: Some(file),
-                read: false,
-                terminal_output: false,
-            };
-            let app = App::new(config);
-            app.run();
-
-            let path = Path::new(file);
-            let text_from_qr = App::read_code(&path).join(" ");
-            fs::remove_file(file).unwrap();
-
-            assert_eq!(text, text_from_qr);
-        }
-    }
-
-    #[test]
-    fn save_in_unsuported_extesion() {
-        let unsuported_extensions =
-            ["txt", "svg", "mp3", "iso", "pdf", "zip", "html", "js"];
-
-        for ext in &unsuported_extensions {
-            let res = panic::catch_unwind(|| {
-                let path = Path::new("file").with_extension(ext);
-                let code = App::make_code("QRrs");
-
-                App::save(&path, &code);
-            });
-            assert!(res.is_err());
-        }
-    }
-
-    #[test]
-    #[should_panic]
-    fn read_non_existent_file() {
-        let file: String = thread_rng()
-            .sample_iter(&Alphanumeric)
-            .take(40)
-            .map(char::from)
-            .collect();
-        let path = Path::new(&file);
-
-        let _ = App::read_code(&path);
-    }
-
-    #[test]
-    fn different_languages_support() {
-        let hellos = [
-            "Dobrý den",
-            "नमस्ते",
-            "こんにちは",
-            "안녕하세요",
-            "Здравствуйте",
-        ];
-        let file = "qr_tmp.png";
-
-        for hello in hellos.iter() {
-            let config = cli::Config {
-                input: Some(hello),
-                output: Some(file),
-                read: false,
-                terminal_output: false,
-            };
-            let app = App::new(config);
-            app.run();
-
-            let path = Path::new(file);
-            let hello_from_qr = App::read_code(&path).join(" ");
-
-            assert_eq!(*hello, hello_from_qr);
-        }
-
-        fs::remove_file(file).unwrap();
     }
 }

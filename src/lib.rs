@@ -198,9 +198,9 @@ impl<'a> App<'a> {
                 panic!();
             })
             .to_luma8();
-        let mut img = PreparedImage::prepare(img);
-        let grids = img.detect_grids();
+        let mut prepared_img = PreparedImage::prepare(img);
 
+        let grids = prepared_img.detect_grids();
         grids
             .into_iter()
             .map(|grid| {

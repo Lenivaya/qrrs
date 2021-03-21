@@ -228,10 +228,7 @@ impl<'a> App<'a> {
         let image = code.render::<Luma<u8>>().build();
 
         image.save(file).unwrap_or_else(|err| {
-            eprintln!(
-                "Error saving code to {:?}: \n{}",
-                file, err
-            );
+            eprintln!("Error saving code to {:?}: \n{}", file, err);
             std::fs::remove_file(file).unwrap();
             panic!();
         });

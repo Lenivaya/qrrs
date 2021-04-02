@@ -23,7 +23,7 @@ pub struct App<'a> {
 impl<'a> App<'a> {
     pub fn start(self) {
         if let Err(e) = self.run() {
-            eprintln!("\nError: {}", e);
+            eprintln!("\nERROR: {}", e);
             panic!();
         }
     }
@@ -203,7 +203,7 @@ impl<'a> App<'a> {
     pub fn read(file: &Path) -> BoxResult<Vec<String>> {
         if !file.exists() {
             eprintln!(
-                "Error opening file: {:?} \nNo such file or directory",
+                "\nERROR opening file: {:?} \nNo such file or directory",
                 file
             );
             panic!()
@@ -217,7 +217,7 @@ impl<'a> App<'a> {
             .into_iter()
             .map(|grid| {
                 let (_, content) = grid.decode().unwrap_or_else(|err| {
-                    eprintln!("Error reading data from qr code: {}", err);
+                    eprintln!("\nERROR reading data from qr code: {}", err);
                     panic!();
                 });
 

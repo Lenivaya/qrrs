@@ -36,10 +36,10 @@ jobs:
           profile: minimal
           override: true
 
-      - name: Build
+      - name: Compile
         uses: actions-rs/cargo@v1
         with:
-          command: build
+          command: check
           args: --verbose --all --locked
 
       - name: Test

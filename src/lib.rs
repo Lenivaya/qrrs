@@ -2,6 +2,7 @@ pub mod cli;
 
 use cli::Config;
 
+use std::error::Error;
 use std::panic;
 use std::path::Path;
 use std::sync::Arc;
@@ -12,13 +13,22 @@ use qrcode::render::unicode;
 use qrcode::QrCode;
 use rqrr::PreparedImage;
 
+pub type BoxResult<T> = Result<T, Box<dyn Error>>;
+
 pub struct App<'a> {
     config: Config<'a>,
 }
 
 // Methods
 impl<'a> App<'a> {
-    pub fn run(self) {
+    pub fn start(self) {
+        if let Err(e) = self.run() {
+            eprintln!("\nError: {}", e);
+            panic!();
+        }
+    }
+
+    fn run(&self) -> BoxResult<()> {
         // Removing output(especially backtrace) when invoking panic
         panic::set_hook(Box::new(|_| {}));
 
@@ -29,7 +39,7 @@ impl<'a> App<'a> {
                 output: Some(o),
                 read: false,
                 terminal_output: false,
-            } => self.save_code(i, o),
+            } => self.save_code(i, o)?,
 
             // Reads code and shows it in terminal
             Config {
@@ -37,7 +47,7 @@ impl<'a> App<'a> {
                 output: None,
                 read: true,
                 terminal_output: true,
-            } => self.print_code(i),
+            } => self.print_code(i)?,
 
             // Reads code and shows it in terminal,
             // also saves to specified output
@@ -46,7 +56,7 @@ impl<'a> App<'a> {
                 output: Some(o),
                 read: true,
                 terminal_output: true,
-            } => self.save_print_code(i, o),
+            } => self.save_print_code(i, o)?,
 
             // Reads qr code, also saves it to specified output
             Config {
@@ -54,7 +64,7 @@ impl<'a> App<'a> {
                 output: Some(o),
                 read: true,
                 terminal_output: false,
-            } => self.save_read_code(i, o),
+            } => self.save_read_code(i, o)?,
 
             // Reads qr code
             Config {
@@ -62,7 +72,7 @@ impl<'a> App<'a> {
                 read: true,
                 terminal_output: false,
                 ..
-            } => self.read_code(i),
+            } => self.read_code(i)?,
 
             // Prints code generated from user input to a terminal,
             // also saves it to specified output
@@ -71,7 +81,7 @@ impl<'a> App<'a> {
                 output: Some(o),
                 read: false,
                 terminal_output: true,
-            } => self.save_gen_print_code(i, o),
+            } => self.save_gen_print_code(i, o)?,
 
             // Prints code generated from user input to a terminal
             Config {
@@ -79,64 +89,71 @@ impl<'a> App<'a> {
                 read: false,
                 terminal_output: true,
                 ..
-            } => self.gen_print_code(i),
+            } => self.gen_print_code(i)?,
 
             _ => unreachable!(),
         }
+
+        Ok(())
     }
 
-    fn save_code(&self, input: &str, output: &str) {
-        let code = App::make_code(input);
+    fn save_code(&self, input: &str, output: &str) -> BoxResult<()> {
+        let code = App::make_code(input)?;
         let file = Path::new(output);
 
-        App::save(&file, &code)
+        App::save(&file, &code)?;
+        Ok(())
     }
 
-    fn read_code(&self, input: &str) {
+    fn read_code(&self, input: &str) -> BoxResult<()> {
         let file = Path::new(input);
-        let data = App::read(&file);
+        let data = App::read(&file)?;
 
         for something in data {
             println!("{}", something)
         }
+
+        Ok(())
     }
 
-    fn print_code(&self, input: &str) {
+    fn print_code(&self, input: &str) -> BoxResult<()> {
         let file = Path::new(input);
-        let data = App::read(&file).join(" ");
+        let data = App::read(&file)?.join(" ");
 
-        let code = App::make_code(&data);
+        let code = App::make_code(&data)?;
         App::print_code_to_term(&code);
+        Ok(())
     }
 
-    fn gen_print_code(&self, input: &str) {
-        let code = App::make_code(input);
-
-        App::print_code_to_term(&code)
+    fn gen_print_code(&self, input: &str) -> BoxResult<()> {
+        let code = App::make_code(input)?;
+        App::print_code_to_term(&code);
+        Ok(())
     }
 
-    fn save_print_code(&self, input: &str, output: &str) {
+    fn save_print_code(&self, input: &str, output: &str) -> BoxResult<()> {
         let file = Path::new(input);
         let output = Path::new(output);
-        let data = App::read(&file).join(" ");
+        let data = App::read(&file)?.join(" ");
 
-        let code = Arc::new(App::make_code(&data));
+        let code = Arc::new(App::make_code(&data)?);
         let codepointer = code.clone();
 
         let print_handle = thread::spawn(move || {
             App::print_code_to_term(&code);
         });
 
-        App::save(&output, &codepointer);
-
+        App::save(&output, &codepointer)?;
         print_handle.join().unwrap();
+
+        Ok(())
     }
 
-    fn save_read_code(&self, input: &str, output: &str) {
+    fn save_read_code(&self, input: &str, output: &str) -> BoxResult<()> {
         let input = Path::new(input);
         let output = Path::new(output);
 
-        let data = Arc::new(App::read(&input));
+        let data = Arc::new(App::read(&input)?);
         let datapointer = data.clone();
 
         let print_handle = thread::spawn(move || {
@@ -146,25 +163,28 @@ impl<'a> App<'a> {
         });
 
         let data_to_write = datapointer.join("");
-        let code = App::make_code(&data_to_write);
-        App::save(&output, &code);
+        let code = App::make_code(&data_to_write)?;
 
+        App::save(&output, &code)?;
         print_handle.join().unwrap();
+
+        Ok(())
     }
 
-    fn save_gen_print_code(&self, input: &str, output: &str) {
+    fn save_gen_print_code(&self, input: &str, output: &str) -> BoxResult<()> {
         let output = Path::new(output);
 
-        let code = Arc::new(App::make_code(input));
+        let code = Arc::new(App::make_code(input)?);
         let codepointer = code.clone();
 
         let print_handle = thread::spawn(move || {
             App::print_code_to_term(&code);
         });
 
-        App::save(&output, &codepointer);
-
+        App::save(&output, &codepointer)?;
         print_handle.join().unwrap();
+
+        Ok(())
     }
 }
 
@@ -174,34 +194,26 @@ impl<'a> App<'a> {
         App { config }
     }
 
-    pub fn make_code(data: &str) -> QrCode {
-        let code = QrCode::new(data.as_bytes()).unwrap_or_else(|err| {
-            eprintln!("Error creating qr code: {}", err);
-            panic!();
-        });
+    pub fn make_code(data: &str) -> BoxResult<QrCode> {
+        let code = QrCode::new(data.as_bytes())?;
 
-        code
+        Ok(code)
     }
 
-    pub fn read(file: &Path) -> Vec<String> {
+    pub fn read(file: &Path) -> BoxResult<Vec<String>> {
         if !file.exists() {
             eprintln!(
                 "Error opening file: {:?} \nNo such file or directory",
                 file
             );
-            panic!();
+            panic!()
         }
 
-        let img = image::open(file)
-            .unwrap_or_else(|err| {
-                eprintln!("Error opening file: {:?} \n{} ", file, err);
-                panic!();
-            })
-            .to_luma8();
+        let img = image::open(file)?.to_luma8();
         let mut prepared_img = PreparedImage::prepare(img);
 
         let grids = prepared_img.detect_grids();
-        grids
+        Ok(grids
             .into_iter()
             .map(|grid| {
                 let (_, content) = grid.decode().unwrap_or_else(|err| {
@@ -211,7 +223,7 @@ impl<'a> App<'a> {
 
                 content
             })
-            .collect::<Vec<String>>()
+            .collect::<Vec<String>>())
     }
 
     pub fn print_code_to_term(code: &QrCode) {
@@ -224,13 +236,9 @@ impl<'a> App<'a> {
         println!("\n{}", image);
     }
 
-    pub fn save(file: &Path, code: &QrCode) {
+    pub fn save(file: &Path, code: &QrCode) -> BoxResult<()> {
         let image = code.render::<Luma<u8>>().build();
 
-        image.save(file).unwrap_or_else(|err| {
-            eprintln!("Error saving code to {:?}: \n{}", file, err);
-            std::fs::remove_file(file).unwrap();
-            panic!();
-        });
+        Ok(image.save(file)?)
     }
 }

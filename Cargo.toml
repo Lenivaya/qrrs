@@ -6,8 +6,8 @@ description = "CLI QR code generator and reader"
 homepage = "https://github.com/Lenivaya/qrrs"
 repository = "https://github.com/Lenivaya/qrrs"
 readme = "README.md"
-keywords = ["cli", "qrcode", "qr", "QR"]
-categories = ["command-line-utilities", "encoding"]
+keywords = ["cli", "qrcode", "qr-code", "qr-code-gen", "qr", "QR", "decoder", "parser", "utility"]
+categories = ["command-line-utilities", "encoding", "parsing"]
 license = "MIT"
 edition = "2018"
 

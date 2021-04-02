@@ -45,7 +45,6 @@ jobs:
 
     runs-on: ${{ matrix.os }}
     continue-on-error: true
-
     steps:
       - name: Setup | Checkout
         uses: actions/checkout@v2
@@ -74,7 +73,7 @@ jobs:
           SDKROOT: /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk
         with:
           command: build
-          args: --release --features tls-vendored --target ${{ matrix.target }}
+          args: --release --target ${{ matrix.target }}
           use-cross: ${{ matrix.os == 'ubuntu-latest' }}
 
       - name: Post Build | Prepare artifacts [Windows]

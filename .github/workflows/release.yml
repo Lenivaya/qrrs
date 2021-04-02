@@ -9,7 +9,7 @@ env:
 
 jobs:
   # Build sources
-  github.build:
+  github_build:
     name: Build release binaries
     strategy:
       fail-fast: false

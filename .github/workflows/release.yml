@@ -8,6 +8,24 @@ env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
+  # Publish qrrs to Crates.io
+  cargo_publish:
+    name: Publish Cargo Package
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup | Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup | Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          profile: minimal
+          override: true
+
+      - name: Build | Publish
+        run: cargo publish --token ${{ secrets.CRATES_IO_TOKEN }}
+
   # Build sources
   github_build:
     name: Build release binaries

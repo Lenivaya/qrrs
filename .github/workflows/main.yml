@@ -45,8 +45,9 @@ jobs:
 
       - name: Upload binaries to release
         uses: actions/upload-artifact@v2
+        run: |
+          mkdir -p ~/target/release
         with:
-          run: mkdir -p ~/target/release
           name: ${{ matrix.asset_name }}-{{ matrix.os }}-{{ matrix.platform }}
           path: target/release/${{ matrix.artifact_name }}
 

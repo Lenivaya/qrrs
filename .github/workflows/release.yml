@@ -121,10 +121,6 @@ jobs:
       - name: Setup | Checksums
         run: for file in qrrs-*/qrrs-*; do openssl dgst -sha256 -r "$file" | awk '{print $1}' > "${file}.sha256"; done
 
-      - name: Setup | Release notes
-        run: |
-          GO111MODULE=on go get github.com/git-chglog/git-chglog/cmd/git-chglog@0.9.1
-          git-chglog -c .github/chglog/release.yml $(git describe --tags) > RELEASE.md
       - name: Build | Publish
         uses: softprops/action-gh-release@v1
         with:

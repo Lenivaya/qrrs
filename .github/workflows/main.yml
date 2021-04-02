@@ -3,6 +3,25 @@ name: CI
 on: [push, pull_request]
 
 jobs:
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: nightly
+          components: rustfmt, clippy
+          override: true
+
+      - uses: actions-rs/clippy-check@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          args: --all-features
+
+      - uses: mbrobbel/rustfmt-check@master
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
   build:
     strategy:
       matrix:
@@ -24,21 +43,13 @@ jobs:
       - name: Test
         run: cargo test --verbose --all
 
-  format:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions-rs/toolchain@v1
+      - name: Upload binaries to release
+        uses: actions/upload-artifact@v2
         with:
-            toolchain: nightly
-            components: rustfmt, clippy
-            override: true
+          name: ${{ matrix.asset_name }}-{{matrix.os}}-{{matrix.platform}}
+          path: target/release/${{ matrix.artifact_name }}
 
-      - uses: actions-rs/clippy-check@v1
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          args: --all-features
-
-      - uses: mbrobbel/rustfmt-check@master
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Dump matrix context
+        env:
+          MATRIX_CONTEXT: ${{ toJson(matrix) }}
+        run: echo "$MATRIX_CONTEXT"

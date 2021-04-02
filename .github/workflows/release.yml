@@ -1,0 +1,135 @@
+name: Release
+
+on:
+  push:
+    tags: ["v[0-9]+.[0-9]+.[0-9]+*"]
+
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  # Build sources
+  github.build:
+    name: Build release binaries
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: x86_64-unknown-linux-gnu
+            os: ubuntu-latest
+            name: qrrs-x86_64-unknown-linux-gnu.tar.gz
+
+          - target: x86_64-apple-darwin
+            os: macOS-latest
+            name: qrrs-x86_64-apple-darwin.tar.gz
+
+          - target: aarch64-apple-darwin
+            os: macOS-latest
+            name: qrrs-aarch64-apple-darwin.tar.gz
+
+          - target: x86_64-pc-windows-msvc
+            os: windows-latest
+            name: qrrs-x86_64-pc-windows-msvc.zip
+
+          - target: i686-pc-windows-msvc
+            os: windows-latest
+            name: qrrs-i686-pc-windows-msvc.zip
+
+          - target: aarch64-pc-windows-msvc
+            os: windows-latest
+            name: qrrs-aarch64-pc-windows-msvc.zip
+
+          - target: x86_64-unknown-freebsd
+            os: ubuntu-latest
+            name: qrrs-x86_64-unknown-freebsd.tar.gz
+
+    runs-on: ${{ matrix.os }}
+    continue-on-error: true
+
+    steps:
+      - name: Setup | Checkout
+        uses: actions/checkout@v2
+
+      # Cache files between builds
+      - name: Setup | Cache Cargo
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Setup | Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+          profile: minimal
+          target: ${{ matrix.target }}
+
+      - name: Build | Build
+        uses: actions-rs/cargo@v1
+        # TODO: Remove this once it's the default
+        env:
+          SDKROOT: /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk
+        with:
+          command: build
+          args: --release --features tls-vendored --target ${{ matrix.target }}
+          use-cross: ${{ matrix.os == 'ubuntu-latest' }}
+
+      - name: Post Build | Prepare artifacts [Windows]
+        if: matrix.os == 'windows-latest'
+        run: |
+          cd target/${{ matrix.target }}/release
+          strip qrrs.exe
+          7z a ../../../${{ matrix.name }} qrrs.exe
+          cd -
+
+      - name: Post Build | Prepare artifacts [-nix]
+        if: matrix.os != 'windows-latest'
+        run: |
+          cd target/${{ matrix.target }}/release
+          # TODO: investigate better cross platform stripping
+          strip qrrs || true
+          tar czvf ../../../${{ matrix.name }} qrrs
+          cd -
+
+      - name: Deploy | Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ matrix.name }}
+          path: ${{ matrix.name }}
+
+  # Create GitHub release with Rust build targets and release notes
+  github_release:
+    name: Create GitHub Release
+    needs: github_build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup | Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Setup | Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: "^1.15.7"
+
+      - name: Setup | Artifacts
+        uses: actions/download-artifact@v2
+
+      - name: Setup | Checksums
+        run: for file in qrrs-*/qrrs-*; do openssl dgst -sha256 -r "$file" | awk '{print $1}' > "${file}.sha256"; done
+
+      - name: Setup | Release notes
+        run: |
+          GO111MODULE=on go get github.com/git-chglog/git-chglog/cmd/git-chglog@0.9.1
+          git-chglog -c .github/chglog/release.yml $(git describe --tags) > RELEASE.md
+      - name: Build | Publish
+        uses: softprops/action-gh-release@v1
+        with:
+          files: qrrs-*/qrrs-*
+          body_path: RELEASE.md
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

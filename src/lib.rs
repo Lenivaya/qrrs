@@ -22,6 +22,9 @@ pub struct App<'a> {
 // Methods
 impl<'a> App<'a> {
     pub fn start(self) {
+        // Removing output(especially backtrace) when invoking panic
+        panic::set_hook(Box::new(|_| {}));
+
         if let Err(e) = self.run() {
             eprintln!("\nERROR: {}", e);
             panic!();
@@ -29,9 +32,6 @@ impl<'a> App<'a> {
     }
 
     fn run(&self) -> BoxResult<()> {
-        // Removing output(especially backtrace) when invoking panic
-        panic::set_hook(Box::new(|_| {}));
-
         match self.config {
             // Saves qr code
             Config {

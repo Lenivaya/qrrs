@@ -21,7 +21,13 @@ pub struct App<'a> {
 
 // Methods
 impl<'a> App<'a> {
-    pub fn run(self) {
+    pub fn start(self) {
+        if let Err(e) = self.run() {
+            eprintln!("\nError: {}", e);
+            panic!();
+        }
+    }
+
     fn run(&self) -> BoxResult<()> {
         // Removing output(especially backtrace) when invoking panic
         panic::set_hook(Box::new(|_| {}));

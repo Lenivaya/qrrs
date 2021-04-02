@@ -5,5 +5,5 @@ fn main() {
     let config = args.get_config();
 
     let app = App::new(config);
-    app.run();
+    app.start();
 }

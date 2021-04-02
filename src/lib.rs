@@ -238,7 +238,8 @@ impl<'a> App<'a> {
 
     pub fn save(file: &Path, code: &QrCode) -> BoxResult<()> {
         let image = code.render::<Luma<u8>>().build();
+        image.save(file)?;
 
-        Ok(image.save(file)?)
+        Ok(())
     }
 }

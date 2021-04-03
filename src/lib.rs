@@ -203,14 +203,6 @@ impl<'a> App<'a> {
     }
 
     pub fn read(file: &Path) -> BoxResult<Vec<String>> {
-        if !file.exists() {
-            eprintln!(
-                "\nERROR opening file: {:?} \nNo such file or directory",
-                file
-            );
-            panic!()
-        }
-
         let img = image::open(file)?.to_luma8();
         let mut prepared_img = PreparedImage::prepare(img);
 

@@ -100,8 +100,8 @@ impl<'a> App<'a> {
     fn save_code(&self, input: &str, output: &str) -> BoxResult<()> {
         let code = App::make_code(input)?;
         let file = Path::new(output);
-
         App::save(&file, &code)?;
+
         Ok(())
     }
 
@@ -122,12 +122,14 @@ impl<'a> App<'a> {
 
         let code = App::make_code(&data)?;
         App::print_code_to_term(&code);
+
         Ok(())
     }
 
     fn gen_print_code(&self, input: &str) -> BoxResult<()> {
         let code = App::make_code(input)?;
         App::print_code_to_term(&code);
+
         Ok(())
     }
 
@@ -213,7 +215,7 @@ impl<'a> App<'a> {
         let mut prepared_img = PreparedImage::prepare(img);
 
         let grids = prepared_img.detect_grids();
-        Ok(grids
+        let contents = grids
             .into_iter()
             .map(|grid| {
                 let (_, content) = grid.decode().unwrap_or_else(|err| {
@@ -223,7 +225,9 @@ impl<'a> App<'a> {
 
                 content
             })
-            .collect::<Vec<String>>())
+            .collect::<Vec<String>>();
+
+        Ok(contents)
     }
 
     pub fn print_code_to_term(code: &QrCode) {

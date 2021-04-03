@@ -60,7 +60,7 @@ fn make_code_with_random_text() -> BoxResult<()> {
 fn save_in_unsuported_extesion() {
     let unsupported_extensions = [
         "txt", "svg", "mp3", "iso", "pdf", "zip", "html", "js", "rs", "py",
-        "docx", "el", "ex", "css", "ts", "tar.gz", "go", "tex", "scss"
+        "docx", "el", "ex", "css", "ts", "tar.gz", "go", "tex", "scss",
     ];
 
     for ext in &unsupported_extensions {

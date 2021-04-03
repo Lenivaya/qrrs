@@ -59,10 +59,12 @@ fn make_code_with_random_text() -> BoxResult<()> {
 #[test]
 #[should_panic]
 fn save_in_unsuported_extesion() {
-    let unsuported_extensions =
-        ["txt", "svg", "mp3", "iso", "pdf", "zip", "html", "js"];
+    let unsupported_extensions = [
+        "txt", "svg", "mp3", "iso", "pdf", "zip", "html", "js", "rs", "py",
+        "docx", "el", "ex", "css", "ts", "tar.gz", "go", "tex", "scss"
+    ];
 
-    for ext in &unsuported_extensions {
+    for ext in &unsupported_extensions {
         let path = Path::new("file").with_extension(ext);
         let code = App::make_code("QRrs").unwrap();
 

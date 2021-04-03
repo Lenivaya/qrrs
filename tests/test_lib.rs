@@ -87,9 +87,16 @@ fn read_non_existent_file() {
 fn different_languages_support() -> BoxResult<()> {
     let hellos = [
         "Dobrý den",
+        "السلام عليكم",
+        "שָׁלוֹם",
+        "你好",
         "नमस्ते",
         "こんにちは",
         "안녕하세요",
+        "Olá",
+        "Hola",
+        "Привіт",
+        "Bonjour",
         "Здравствуйте",
     ];
     let file = "qr_tmp.png";

@@ -15,6 +15,7 @@ use rqrr::PreparedImage;
 
 pub type BoxResult<T> = Result<T, Box<dyn Error>>;
 
+#[derive(Debug)]
 pub struct App<'a> {
     config: Config<'a>,
 }

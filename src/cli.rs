@@ -9,6 +9,7 @@ pub struct Config<'a> {
     pub terminal_output: bool,
 }
 
+#[derive(Debug, Default)]
 pub struct Arguments<'a> {
     pub matches: ArgMatches<'a>,
 }

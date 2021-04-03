@@ -1,4 +1,3 @@
-#[cfg(test)]
 use qrrs::*;
 use rand::distributions::Alphanumeric;
 use rand::{thread_rng, Rng};

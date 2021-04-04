@@ -31,6 +31,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
   build:
+    needs: format
     strategy:
       matrix:
         platform: [ubuntu-latest, macos-latest, windows-latest]

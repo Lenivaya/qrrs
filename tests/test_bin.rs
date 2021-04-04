@@ -2,6 +2,9 @@ use qrrs::*;
 
 use assert_cmd::Command;
 use predicates::{prelude::*, str};
+use rand::distributions::Alphanumeric;
+use rand::{thread_rng, Rng};
+use std::{fs, path::Path};
 
 #[test]
 fn failures_wiithout_argumnents() -> BoxResult<()> {
@@ -9,7 +12,8 @@ fn failures_wiithout_argumnents() -> BoxResult<()> {
 
     cmd.assert()
         .failure()
-        .stderr(str::contains("For more information try --help"));
+        .stderr(str::contains("For more information try --help"))
+        .stderr(str::contains("USAGE:"));
 
     Ok(())
 }
@@ -23,8 +27,32 @@ fn wrong_arguments() -> BoxResult<()> {
     cmd.assert()
         .failure()
         .stderr(str::contains("For more information try --help"))
-        .stderr(str::contains("wasn't expected"));
+        .stderr(str::contains("wasn't expected"))
+        .stderr(str::contains("USAGE:"));
 
+    Ok(())
+}
+
+#[test]
+fn reads_qr_code() -> BoxResult<()> {
+    let file = "qr_random_text.png";
+    let path = Path::new(file);
+    let text: String = thread_rng()
+        .sample_iter(&Alphanumeric)
+        .take(30)
+        .map(char::from)
+        .collect();
+
+    let code = App::make_code(&text)?;
+    App::save(&path, &code)?;
+
+    let mut cmd = Command::cargo_bin("qrrs")?;
+
+    cmd.arg("-r").arg(file);
+
+    cmd.assert().success().stdout(str::contains(text));
+
+    fs::remove_file(file)?;
     Ok(())
 }
 

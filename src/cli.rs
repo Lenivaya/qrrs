@@ -10,11 +10,11 @@ pub struct Config<'a> {
 }
 
 #[derive(Debug, Default)]
-pub struct Arguments<'a> {
-    pub matches: ArgMatches<'a>,
+pub struct Arguments {
+    pub matches: ArgMatches,
 }
 
-impl<'a> Arguments<'a> {
+impl<'a> Arguments {
     pub fn new() -> Self {
         let matches = App::new("qrrs")
             .about("CLI tool for working with qr-codes")

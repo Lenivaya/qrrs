@@ -1,15 +1,18 @@
+<p align="center">
+    <img src="https://user-images.githubusercontent.com/49302467/111488823-47600b00-8742-11eb-8fe4-125657091599.png" width="35%" height="65%" align="center" margin="3em">
+</p>
+
 <h1 align="center">QRrs</h1>
 
 <p align="center">CLI QR code generator and reader written in rust</p>
 
 ![CI](https://github.com/Lenivaya/qrrs/workflows/CI/badge.svg)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
+<a href="https://crates.io/crates/qrrs"><img src="https://img.shields.io/crates/v/qrrs.svg?colorB=319e8c" alt="Version info"></a><br>
 
 # Info
 
-<img src="https://user-images.githubusercontent.com/49302467/111488823-47600b00-8742-11eb-8fe4-125657091599.png" width="40%" height="70%" align="right" float="right" margin="2em">
-
-QRrs is a command-line utility written in rust for working with qr codes (what actually follows from the name).
+QRrs is a simple, cross-platform, command-line utility written in rust for working with qr codes (what actually follows from the name).
 
 ## Usage
 

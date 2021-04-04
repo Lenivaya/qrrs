@@ -10,11 +10,11 @@ pub struct Config<'a> {
 }
 
 #[derive(Debug, Default)]
-pub struct Arguments<'a> {
-    pub matches: ArgMatches<'a>,
+pub struct Arguments {
+    pub matches: ArgMatches,
 }
 
-impl<'a> Arguments<'a> {
+impl<'a> Arguments {
     pub fn new() -> Self {
         let matches = App::new("qrrs")
             .about("CLI tool for working with qr-codes")
@@ -22,29 +22,29 @@ impl<'a> Arguments<'a> {
             .author(crate_authors!())
             .setting(AppSettings::ColoredHelp)
             .arg(
-                Arg::with_name("INPUT")
-                    .help("Input data")
+                Arg::new("INPUT")
+                    .about("Input data")
                     .index(1)
                     .required(true),
             )
             .arg(
-                Arg::with_name("OUTPUT")
-                    .help("Output file")
+                Arg::new("OUTPUT")
+                    .about("Output file")
                     .index(2)
-                    .required_unless("read")
-                    .required_unless("terminal"),
+                    .required_unless_present("read")
+                    .required_unless_present("terminal"),
             )
             .arg(
-                Arg::with_name("read")
-                    .short("r")
-                    .help("Reads the qr-code instead of generating it")
+                Arg::new("read")
+                    .short('r')
+                    .about("Reads the qr-code instead of generating it")
                     .long("read")
                     .takes_value(false),
             )
             .arg(
-                Arg::with_name("terminal")
-                    .short("t")
-                    .help("Displays code in terminal")
+                Arg::new("terminal")
+                    .short('t')
+                    .about("Displays code in terminal")
                     .long("terminal")
                     .takes_value(false),
             )
@@ -52,6 +52,7 @@ impl<'a> Arguments<'a> {
 
         Arguments { matches }
     }
+
     pub fn get_config(&'a self) -> Config<'a> {
         Config {
             input: self.matches.value_of("INPUT"),

@@ -1,5 +1,5 @@
 use clap::{crate_authors, crate_version};
-use clap::{App, Arg, AppSettings, ArgMatches};
+use clap::{App, AppSettings, Arg, ArgMatches};
 
 #[derive(Debug)]
 pub struct Config<'a> {

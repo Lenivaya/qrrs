@@ -16,7 +16,14 @@ pub struct Arguments {
 
 impl<'a> Arguments {
     pub fn new() -> Self {
-        let matches = App::new("qrrs")
+        let cli = Arguments::gen_cli();
+        let matches = cli.get_matches();
+
+        Arguments { matches }
+    }
+
+    pub fn gen_cli() -> App<'a> {
+        App::new("qrrs")
             .about("CLI tool for working with qr-codes")
             .version(crate_version!())
             .author(crate_authors!())
@@ -48,9 +55,6 @@ impl<'a> Arguments {
                     .long("terminal")
                     .takes_value(false),
             )
-            .get_matches();
-
-        Arguments { matches }
     }
 
     pub fn get_config(&'a self) -> Config<'a> {

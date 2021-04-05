@@ -59,3 +59,23 @@ jobs:
         with:
           command: test
           args: --verbose --all
+
+  code_coverage:
+    needs: [format, build]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: nightly
+          override: true
+
+      - name: Generate coverage report
+        uses: actions-rs/tarpaulin@v0.1
+        with:
+          args: "-- --verbose --all-features"
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v1
+        with:
+          verbose: true

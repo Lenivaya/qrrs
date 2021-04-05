@@ -15,6 +15,7 @@ pub struct Arguments {
 }
 
 impl<'a> Arguments {
+    #[cfg(not(tarpaulin_include))]
     pub fn new() -> Self {
         let cli = Arguments::gen_cli();
         let matches = cli.get_matches();

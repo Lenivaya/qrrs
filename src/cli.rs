@@ -1,7 +1,7 @@
 use clap::{crate_authors, crate_version};
 use clap::{App, AppSettings, Arg, ArgMatches};
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct Config<'a> {
     pub input: Option<&'a str>,
     pub output: Option<&'a str>,

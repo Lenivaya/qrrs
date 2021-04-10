@@ -35,7 +35,6 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
   build:
-    needs: format
     strategy:
       matrix:
         platform: [ubuntu-latest, macos-latest, windows-latest]
@@ -78,3 +77,4 @@ jobs:
         uses: codecov/codecov-action@v1
         with:
           verbose: true
+          fail_ci_if_error: true

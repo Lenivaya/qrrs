@@ -4,5 +4,5 @@ coverage:
   precision: 2
 
 ignore:
-  - src/main.rs
-  - */tests/.*
+  - /src/main.rs
+  - /tests/

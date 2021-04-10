@@ -9,6 +9,7 @@ on:
       - "**.rs"
       - "Cargo*"
       - ".github/workflows/**.yml"
+      - "codecov.yml"
   pull_request:
     branches:
       - "*"

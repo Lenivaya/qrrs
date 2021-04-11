@@ -76,7 +76,7 @@ jobs:
           args: --verbose --all
 
   code_coverage:
-    needs: [format, build]
+    needs: [format, compile, test]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2

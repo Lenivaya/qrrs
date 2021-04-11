@@ -9,7 +9,7 @@ on:
       - "**.rs"
       - "Cargo*"
       - ".github/workflows/**.yml"
-      - ".codecov.yml"
+      - ".github/.codecov.yml"
   pull_request:
     branches:
       - "*"
@@ -35,7 +35,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
-  build:
+  compile:
     strategy:
       matrix:
         platform: [ubuntu-latest, macos-latest, windows-latest]
@@ -54,6 +54,20 @@ jobs:
         with:
           command: check
           args: --verbose --all --locked
+
+  test:
+    strategy:
+      matrix:
+        platform: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.platform }}
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          profile: minimal
+          override: true
 
       - name: Test
         uses: actions-rs/cargo@v1

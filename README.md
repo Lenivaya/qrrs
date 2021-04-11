@@ -36,7 +36,9 @@ $ qrrs -t "Something" /tmp/qr.png
 ```
 
 
-``` console
+
+
+```rich-text-format
 
 █████████████████████████████
 █████████████████████████████
@@ -62,7 +64,7 @@ $ qrrs -t "Something" /tmp/qr.png
 $ qrrs --read --terminal /tmp/qr.png
 ```
 
-```console
+```rich-text-format
 
 █████████████████████████████
 █████████████████████████████

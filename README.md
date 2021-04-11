@@ -12,6 +12,8 @@
 
 # Info
 
+<img src="https://user-images.githubusercontent.com/49302467/114319615-d9c5b580-9b1a-11eb-9562-27c220a40881.png" alt="emacs screenshot" align="right" width="400px">
+
 QRrs is a simple, cross-platform, command-line utility written in rust for working with qr codes (what actually follows from the name).
 
 ## Usage
@@ -27,13 +29,14 @@ $ qrrs --read /tmp/qr.png
 Something
 ```
 
-### Show code as text in terminal, or save it in a file
+### Print generated code to term
 
 ```console
-$ qrrs --read --terminal /tmp/qr.png
+$ qrrs -t "Something" /tmp/qr.png
 ```
 
-```
+
+``` console
 
 █████████████████████████████
 █████████████████████████████
@@ -53,13 +56,33 @@ $ qrrs --read --terminal /tmp/qr.png
 
 ```
 
+### Show code as text in terminal 
+
 ```console
-$ qrrs --read --terminal /tmp/qr.png >> code.txt
+$ qrrs --read --terminal /tmp/qr.png
 ```
 
-## More advanced commands
+```console
 
-Using read and terminal flags together with output specified, as a result shows the QrCode in terminal and copies it to new file.
+█████████████████████████████
+█████████████████████████████
+████ ▄▄▄▄▄ █▄ █▄▄█ ▄▄▄▄▄ ████
+████ █   █ █▀▄████ █   █ ████
+████ █▄▄▄█ █ ▄█▀▄█ █▄▄▄█ ████
+████▄▄▄▄▄▄▄█ ▀ ▀ █▄▄▄▄▄▄▄████
+████▄███ █▄▄ ▄▀ ▀▄▄▄  █▀▄████
+████▄ ▀█▀▄▄▀▄▀▀▄█▀▄█ █▄ ▀████
+████▄█▄██▄▄▄▀▀▀█ ▄▀█ ▀█▄ ████
+████ ▄▄▄▄▄ █▄▀▄▀ ▄▄▀ ██ █████
+████ █   █ █▄█▀ ▀▄▄█ ▀▀ ▀████
+████ █▄▄▄█ ██▀ ▄█▀ ▀ ████████
+████▄▄▄▄▄▄▄█▄▄▄█▄▄▄▄█▄██▄████
+█████████████████████████████
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
+
+```
+
+### Save it into another file
 
 ```console
 $ qrrs --read --terminal /tmp/qr.png /tmp/qr1.png
@@ -84,3 +107,5 @@ $ cargo install qrrs
 ```console
 $ cargo install --git https://github.com/Lenivaya/qrrs.git
 ```
+
+### [Precompiled binaries](https://github.com/Lenivaya/qrrs/releases) 

@@ -18,6 +18,12 @@ QRrs is a simple, cross-platform, command-line utility written in rust for worki
 
 ## Usage
 
+### Quickly generate qr code
+
+```console
+$ qrrs "Your input here"
+```
+
 ### Generate code, than read it
 
 ```console
@@ -34,9 +40,6 @@ Something
 ```console
 $ qrrs -t "Something" /tmp/qr.png
 ```
-
-
-
 
 ```rich-text-format
 
@@ -58,7 +61,7 @@ $ qrrs -t "Something" /tmp/qr.png
 
 ```
 
-### Show code as text in terminal 
+### Show code as text in terminal
 
 ```console
 $ qrrs --read --terminal /tmp/qr.png
@@ -110,4 +113,4 @@ $ cargo install qrrs
 $ cargo install --git https://github.com/Lenivaya/qrrs.git
 ```
 
-### [Precompiled binaries](https://github.com/Lenivaya/qrrs/releases) 
+### [Precompiled binaries](https://github.com/Lenivaya/qrrs/releases)

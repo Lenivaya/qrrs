@@ -39,6 +39,7 @@ impl<'a> Arguments {
                 Arg::new("OUTPUT")
                     .about("Output file")
                     .index(2)
+                    .required_unless_present("INPUT")
                     .required_unless_present("read")
                     .required_unless_present("terminal"),
             )

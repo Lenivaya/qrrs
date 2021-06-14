@@ -34,6 +34,17 @@ impl<'a> App<'a> {
 
     fn run(&self) -> BoxResult<()> {
         match self.config {
+            /*
+            Prints code generated from user input to a terminal
+            default behaviour with only an input available
+            */
+            Config {
+                input: Some(i),
+                output: None,
+                read: false,
+                terminal_output: false,
+            } => self.gen_print_code(i)?,
+
             // Saves qr code
             Config {
                 input: Some(i),
@@ -83,14 +94,6 @@ impl<'a> App<'a> {
                 read: false,
                 terminal_output: true,
             } => self.save_gen_print_code(i, o)?,
-
-            // Prints code generated from user input to a terminal
-            Config {
-                input: Some(i),
-                read: false,
-                terminal_output: true,
-                ..
-            } => self.gen_print_code(i)?,
 
             _ => unreachable!(),
         }

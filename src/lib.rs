@@ -104,14 +104,14 @@ impl<'a> App<'a> {
     fn save_code(&self, input: &str, output: &str) -> BoxResult<()> {
         let code = App::make_code(input)?;
         let file = Path::new(output);
-        App::save(&file, &code)?;
+        App::save(file, &code)?;
 
         Ok(())
     }
 
     fn read_code(&self, input: &str) -> BoxResult<()> {
         let file = Path::new(input);
-        let data = App::read(&file)?;
+        let data = App::read(file)?;
 
         for something in data {
             println!("{}", something)
@@ -122,7 +122,7 @@ impl<'a> App<'a> {
 
     fn print_code(&self, input: &str) -> BoxResult<()> {
         let file = Path::new(input);
-        let data = App::read(&file)?.join(" ");
+        let data = App::read(file)?.join(" ");
 
         let code = App::make_code(&data)?;
         App::print_code_to_term(&code);
@@ -140,7 +140,7 @@ impl<'a> App<'a> {
     fn save_print_code(&self, input: &str, output: &str) -> BoxResult<()> {
         let file = Path::new(input);
         let output = Path::new(output);
-        let data = App::read(&file)?.join(" ");
+        let data = App::read(file)?.join(" ");
 
         let code = Arc::new(App::make_code(&data)?);
         let codepointer = code.clone();
@@ -149,7 +149,7 @@ impl<'a> App<'a> {
             App::print_code_to_term(&code);
         });
 
-        App::save(&output, &codepointer)?;
+        App::save(output, &codepointer)?;
         print_handle.join().unwrap();
 
         Ok(())
@@ -159,7 +159,7 @@ impl<'a> App<'a> {
         let input = Path::new(input);
         let output = Path::new(output);
 
-        let data = Arc::new(App::read(&input)?);
+        let data = Arc::new(App::read(input)?);
         let datapointer = data.clone();
 
         let print_handle = thread::spawn(move || {
@@ -171,7 +171,7 @@ impl<'a> App<'a> {
         let data_to_write = datapointer.join("");
         let code = App::make_code(&data_to_write)?;
 
-        App::save(&output, &code)?;
+        App::save(output, &code)?;
         print_handle.join().unwrap();
 
         Ok(())
@@ -187,7 +187,7 @@ impl<'a> App<'a> {
             App::print_code_to_term(&code);
         });
 
-        App::save(&output, &codepointer)?;
+        App::save(output, &codepointer)?;
         print_handle.join().unwrap();
 
         Ok(())

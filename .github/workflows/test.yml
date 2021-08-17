@@ -1,0 +1,76 @@
+name: Test
+
+on:
+  push:
+    branches:
+      - master
+    tags-ignore: ["v[0-9]+.[0-9]+.[0-9]+*"]
+    paths:
+      - "**.rs"
+      - "Cargo*"
+      - ".github/workflows/**.yml"
+      - ".github/.codecov.yml"
+  pull_request:
+    branches:
+      - "*"
+    tags-ignore: ["v[0-9]+.[0-9]+.[0-9]+*"]
+
+jobs:
+  compile:
+    strategy:
+      matrix:
+        platform: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.platform }}
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          profile: minimal
+          override: true
+
+      - name: Compile
+        uses: actions-rs/cargo@v1
+        with:
+          command: check
+          args: --verbose --all --locked
+
+  test:
+    strategy:
+      matrix:
+        platform: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.platform }}
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          profile: minimal
+          override: true
+
+      - name: Test
+        uses: actions-rs/cargo@v1
+        with:
+          command: test
+          args: --verbose --all
+
+  code_coverage:
+    needs: [compile, test]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: nightly
+          override: true
+
+      - name: Generate coverage report
+        uses: actions-rs/tarpaulin@v0.1
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v1
+        with:
+          verbose: true
+          fail_ci_if_error: true

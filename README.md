@@ -1,7 +1,3 @@
-<p align="center">
-    <img src="https://user-images.githubusercontent.com/49302467/111488823-47600b00-8742-11eb-8fe4-125657091599.png" width="35%" height="65%" align="center" margin="3em">
-</p>
-
 <h1 align="center">QRrs</h1>
 
 <p align="center">CLI QR code generator and reader written in rust</p>

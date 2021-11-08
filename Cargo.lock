@@ -692,9 +692,9 @@ checksum = "24d5f089152e60f62d28b835fbff2cd2e8dc0baf1ac13343bef92ab7eed84548"
 
 [[package]]
 name = "rqrr"
-version = "0.3.2"
+version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e88a63da014e6f18dbe76e3084feb2f6c5a570ad8d524cc1afff4a6db18404cd"
+checksum = "6fa79947f53b20adb909a323d828d0fd744fa9d854792df07913b083bcd4d63b"
 dependencies = [
  "g2p",
  "image",

@@ -1,5 +1,5 @@
 use clap::{crate_authors, crate_version};
-use clap::{App, AppSettings, Arg, ArgMatches};
+use clap::{App, Arg, ArgMatches};
 
 #[derive(Debug, PartialEq)]
 pub struct Config<'a> {
@@ -28,7 +28,6 @@ impl<'a> Arguments {
             .about("CLI tool for working with qr-codes")
             .version(crate_version!())
             .author(crate_authors!())
-            .setting(AppSettings::ColoredHelp)
             .arg(
                 Arg::new("INPUT")
                     .about("Input data")

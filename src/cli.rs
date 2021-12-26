@@ -28,15 +28,10 @@ impl<'a> Arguments {
             .about("CLI tool for working with qr-codes")
             .version(crate_version!())
             .author(crate_authors!())
-            .arg(
-                Arg::new("INPUT")
-                    .about("Input data")
-                    .index(1)
-                    .required(true),
-            )
+            .arg(Arg::new("INPUT").help("Input data").index(1).required(true))
             .arg(
                 Arg::new("OUTPUT")
-                    .about("Output file")
+                    .help("Output file")
                     .index(2)
                     .required_unless_present("INPUT")
                     .required_unless_present("read")
@@ -45,14 +40,14 @@ impl<'a> Arguments {
             .arg(
                 Arg::new("read")
                     .short('r')
-                    .about("Reads the qr-code instead of generating it")
+                    .help("Reads the qr-code instead of generating it")
                     .long("read")
                     .takes_value(false),
             )
             .arg(
                 Arg::new("terminal")
                     .short('t')
-                    .about("Displays code in terminal")
+                    .help("Displays code in terminal")
                     .long("terminal")
                     .takes_value(false),
             )

@@ -1,6 +1,6 @@
 pub mod cli;
 
-use cli::Config;
+use cli::Arguments;
 
 use std::error::Error;
 use std::panic;
@@ -16,12 +16,12 @@ use rqrr::PreparedImage;
 pub type BoxResult<T> = Result<T, Box<dyn Error>>;
 
 #[derive(Debug)]
-pub struct App<'a> {
-    config: Config<'a>,
+pub struct App {
+    args: Arguments,
 }
 
 // Methods
-impl<'a> App<'a> {
+impl App {
     pub fn start(self) {
         // Removing output(especially backtrace) when invoking panic
         panic::set_hook(Box::new(|_| {}));
@@ -32,10 +32,10 @@ impl<'a> App<'a> {
         }
     }
 
-    fn run(&self) -> BoxResult<()> {
-        match self.config {
+    fn run(self) -> BoxResult<()> {
+        match &self.args {
             // Saves qr code
-            Config {
+            Arguments {
                 input: Some(i),
                 output: Some(o),
                 read: false,
@@ -43,7 +43,7 @@ impl<'a> App<'a> {
             } => self.save_code(i, o)?,
 
             // Reads code and shows it in terminal
-            Config {
+            Arguments {
                 input: Some(i),
                 output: None,
                 read: true,
@@ -52,7 +52,7 @@ impl<'a> App<'a> {
 
             // Reads code and shows it in terminal,
             // also saves to specified output
-            Config {
+            Arguments {
                 input: Some(i),
                 output: Some(o),
                 read: true,
@@ -60,7 +60,7 @@ impl<'a> App<'a> {
             } => self.save_print_code(i, o)?,
 
             // Reads qr code, also saves it to specified output
-            Config {
+            Arguments {
                 input: Some(i),
                 output: Some(o),
                 read: true,
@@ -68,7 +68,7 @@ impl<'a> App<'a> {
             } => self.save_read_code(i, o)?,
 
             // Reads qr code
-            Config {
+            Arguments {
                 input: Some(i),
                 read: true,
                 terminal_output: false,
@@ -77,7 +77,7 @@ impl<'a> App<'a> {
 
             // Prints code generated from user input to a terminal,
             // also saves it to specified output
-            Config {
+            Arguments {
                 input: Some(i),
                 output: Some(o),
                 read: false,
@@ -88,7 +88,7 @@ impl<'a> App<'a> {
             Prints code generated from user input to a terminal
             default behaviour with only an input available
             */
-            Config {
+            Arguments {
                 input: Some(i),
                 output: None,
                 read: false,
@@ -156,8 +156,8 @@ impl<'a> App<'a> {
     }
 
     fn save_read_code(&self, input: &str, output: &str) -> BoxResult<()> {
-        let input = Path::new(input);
-        let output = Path::new(output);
+        let input = Path::new(&input);
+        let output = Path::new(&output);
 
         let data = Arc::new(App::read(input)?);
         let datapointer = data.clone();
@@ -178,7 +178,7 @@ impl<'a> App<'a> {
     }
 
     fn save_gen_print_code(&self, input: &str, output: &str) -> BoxResult<()> {
-        let output = Path::new(output);
+        let output = Path::new(&output);
 
         let code = Arc::new(App::make_code(input)?);
         let codepointer = code.clone();
@@ -195,9 +195,9 @@ impl<'a> App<'a> {
 }
 
 // Associated functions
-impl<'a> App<'a> {
-    pub fn new(config: Config<'a>) -> Self {
-        App { config }
+impl App {
+    pub fn new(args: Arguments) -> Self {
+        App { args }
     }
 
     pub fn make_code(data: &str) -> BoxResult<QrCode> {

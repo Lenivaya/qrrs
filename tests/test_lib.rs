@@ -18,7 +18,7 @@ fn make_code() -> BoxResult<()> {
     app.start();
 
     let path = Path::new(file);
-    let text_from_qr = App::read(&path)?.join(" ");
+    let text_from_qr = App::read(path)?.join(" ");
     fs::remove_file(file)?;
 
     assert_eq!(text, text_from_qr);
@@ -42,7 +42,7 @@ fn make_code_with_random_text() -> BoxResult<()> {
         app.start();
 
         let path = Path::new(file);
-        let text_from_qr = App::read(&path)?.join(" ");
+        let text_from_qr = App::read(path)?.join(" ");
         fs::remove_file(file)?;
 
         assert_eq!(text, text_from_qr);
@@ -73,7 +73,7 @@ fn read_non_existent_file() {
     let file: String = random_text();
     let path = Path::new(&file);
 
-    let _ = App::read(&path).unwrap();
+    let _ = App::read(path).unwrap();
 }
 
 #[test]
@@ -105,7 +105,7 @@ fn different_languages_support() -> BoxResult<()> {
         app.start();
 
         let path = Path::new(file);
-        let hello_from_qr = App::read(&path)?.join(" ");
+        let hello_from_qr = App::read(path)?.join(" ");
 
         assert_eq!(*hello, hello_from_qr);
     }

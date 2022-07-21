@@ -43,7 +43,7 @@ fn reads_qr_code() -> BoxResult<()> {
         .collect();
 
     let code = App::make_code(&text)?;
-    App::save(&path, &code)?;
+    App::save(path, &code)?;
 
     let mut cmd = Command::cargo_bin("qrrs")?;
 

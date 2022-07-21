@@ -11,6 +11,12 @@ categories = ["command-line-utilities", "encoding", "parsing"]
 license = "MIT"
 edition = "2018"
 
+[profile.release]
+lto = true
+opt-level = 'z'
+codegen-units = 1
+panic = 'abort'
+
 [dependencies]
 qrcode = "0.12.0"
 rqrr = "0.4.0"

@@ -1,10 +1,9 @@
-use qrrs::*;
-
 use assert_cmd::Command;
 use predicates::{prelude::*, str};
-use rand::distributions::Alphanumeric;
-use rand::{thread_rng, Rng};
 use std::{fs, path::Path};
+
+mod test_common;
+use test_common::*;
 
 #[test]
 fn failures_wiithout_argumnents() -> BoxResult<()> {

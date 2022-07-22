@@ -2,21 +2,35 @@ use clap::{App, IntoApp, ValueEnum};
 use clap_complete::{generate_to, Shell};
 use clap_mangen::Man;
 
-use std::{env, io::Error, path::PathBuf};
+use std::{env, error::Error, path::PathBuf};
 
 include!("src/cli.rs");
 
-type Res = Result<(), Error>;
+type Res = Result<(), Box<dyn Error>>;
 
 fn main() -> Res {
-    let outdir = match env::var_os("OUT_DIR") {
-        None => return Ok(()),
-        Some(outdir) => PathBuf::from(outdir),
-    };
     let mut cli = Arguments::command();
 
-    generate_completions(&mut cli, &outdir)?;
-    generate_manpage(cli, &outdir)?;
+    let profile = env::var("PROFILE")?;
+    match profile.as_str() {
+        "release" => {
+            let outdir_c = PathBuf::from("./completions");
+            let outdir_m = PathBuf::from("./man");
+
+            generate_completions(&mut cli, &outdir_c)?;
+            generate_manpage(cli, &outdir_m)?;
+        }
+        // "debug" => {
+        //     let outdir = match env::var_os("OUT_DIR") {
+        //         None => return Ok(()),
+        //         Some(outdir) => PathBuf::from(outdir),
+        //     };
+
+        //     generate_completions(&mut cli, &outdir)?;
+        //     generate_manpage(cli, &outdir)?;
+        // }
+        _ => (),
+    }
 
     Ok(())
 }

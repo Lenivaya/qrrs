@@ -12,6 +12,7 @@ pub struct Arguments {
     )]
     pub input: Option<String>,
 
+    /// Output file
     #[clap(
         name = "OUTPUT",
         value_hint = ValueHint::AnyPath,

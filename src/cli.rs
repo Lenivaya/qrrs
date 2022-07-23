@@ -22,10 +22,10 @@ pub struct Arguments {
     pub output: Option<String>,
 
     /// Reads the qr-code instead of generating it
-    #[clap(name = "read", short = 'r', long = "read")]
+    #[clap(name = "read", short, long)]
     pub read: bool,
 
     /// Displays code in terminal
-    #[clap(name = "terminal", short = 't', long = "terminal")]
+    #[clap(name = "terminal", short, long)]
     pub terminal_output: bool,
 }

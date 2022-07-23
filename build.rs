@@ -2,6 +2,8 @@ use clap::{App, IntoApp, ValueEnum};
 use clap_complete::{generate_to, Shell};
 use clap_mangen::Man;
 
+use roff::{line_break, roman, Roff};
+
 use std::{env, error::Error, path::PathBuf};
 
 include!("src/cli.rs");
@@ -55,9 +57,20 @@ fn generate_completions(cli: &mut App, outdir: &PathBuf) -> Res {
 fn generate_manpage(cli: App, outdir: &PathBuf) -> Res {
     let mut buffer: Vec<u8> = Default::default();
 
-    let man = Man::new(cli);
     let man_file = outdir.join("qrrs.1");
+    let man = Man::new(cli);
     man.render(&mut buffer)?;
+    Roff::new()
+        .control("SH", ["EXAMPLES OF USAGE"])
+        .text([
+            roman("qrrs \"Your input here\""),
+            line_break(),
+            roman("qrrs \"Something\" /tmp/qr.png "),
+            line_break(),
+            roman("qrrs -r /tmp/qr.png "),
+            line_break(),
+        ])
+        .to_writer(&mut buffer)?;
 
     std::fs::write(&man_file, buffer)?;
     println!("cargo:warning=manpage file is generated: {:?}", man_file);

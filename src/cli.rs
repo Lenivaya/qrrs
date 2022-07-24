@@ -1,64 +1,31 @@
-use clap::{crate_authors, crate_version};
-use clap::{App, Arg, ArgMatches};
+use clap::{Parser, ValueHint};
 
-#[derive(Debug, PartialEq)]
-pub struct Config<'a> {
-    pub input: Option<&'a str>,
-    pub output: Option<&'a str>,
-    pub read: bool,
-    pub terminal_output: bool,
-}
-
-#[derive(Debug, Default)]
+#[derive(Parser, Debug)]
+#[clap(name = "qrrs", author, about, version)]
 pub struct Arguments {
-    pub matches: ArgMatches,
-}
+    /// Input data
+    #[clap(
+        name = "INPUT",
+        value_hint = ValueHint::AnyPath,
+        required(true),
+        index(1)
+    )]
+    pub input: Option<String>,
 
-impl<'a> Arguments {
-    #[cfg(not(tarpaulin_include))]
-    pub fn new() -> Self {
-        let cli = Arguments::gen_cli();
-        let matches = cli.get_matches();
+    /// Output file
+    #[clap(
+        name = "OUTPUT",
+        value_hint = ValueHint::AnyPath,
+        required_unless_present_any(["INPUT", "read", "terminal"]),
+        index(2)
+    )]
+    pub output: Option<String>,
 
-        Arguments { matches }
-    }
+    /// Reads the qr-code instead of generating it
+    #[clap(name = "read", short, long)]
+    pub read: bool,
 
-    pub fn gen_cli() -> App<'a> {
-        App::new("qrrs")
-            .about("CLI tool for working with qr-codes")
-            .version(crate_version!())
-            .author(crate_authors!())
-            .arg(Arg::new("INPUT").help("Input data").index(1).required(true))
-            .arg(
-                Arg::new("OUTPUT")
-                    .help("Output file")
-                    .index(2)
-                    .required_unless_present("INPUT")
-                    .required_unless_present("read")
-                    .required_unless_present("terminal"),
-            )
-            .arg(
-                Arg::new("read")
-                    .short('r')
-                    .help("Reads the qr-code instead of generating it")
-                    .long("read")
-                    .takes_value(false),
-            )
-            .arg(
-                Arg::new("terminal")
-                    .short('t')
-                    .help("Displays code in terminal")
-                    .long("terminal")
-                    .takes_value(false),
-            )
-    }
-
-    pub fn get_config(&'a self) -> Config<'a> {
-        Config {
-            input: self.matches.value_of("INPUT"),
-            output: self.matches.value_of("OUTPUT"),
-            read: self.matches.is_present("read"),
-            terminal_output: self.matches.is_present("terminal"),
-        }
-    }
+    /// Displays code in terminal
+    #[clap(name = "terminal", short, long)]
+    pub terminal_output: bool,
 }

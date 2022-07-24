@@ -1,0 +1,42 @@
+.ie \n(.g .ds Aq \(aq
+.el .ds Aq '
+.TH qrrs 1  "qrrs 0.1.8" 
+.SH NAME
+qrrs \- CLI QR code generator and reader
+.SH SYNOPSIS
+\fBqrrs\fR [\fB\-h\fR|\fB\-\-help\fR] [\fB\-V\fR|\fB\-\-version\fR] [\fB\-r\fR|\fB\-\-read\fR] [\fB\-t\fR|\fB\-\-terminal\fR] <\fIINPUT\fR> [\fIOUTPUT\fR] 
+.SH DESCRIPTION
+CLI QR code generator and reader
+.SH OPTIONS
+.TP
+\fB\-h\fR, \fB\-\-help\fR
+Print help information
+.TP
+\fB\-V\fR, \fB\-\-version\fR
+Print version information
+.TP
+\fB\-r\fR, \fB\-\-read\fR
+Reads the qr\-code instead of generating it
+.TP
+\fB\-t\fR, \fB\-\-terminal\fR
+Displays code in terminal
+.TP
+<\fIINPUT\fR>
+Input data
+.TP
+[\fIOUTPUT\fR]
+Output file
+.SH VERSION
+v0.1.8
+.SH AUTHORS
+Lenivaya <xocada@gmail.com>
+.ie \n(.g .ds Aq \(aq
+.el .ds Aq '
+.SH "EXAMPLES OF USAGE"
+qrrs "Your input here"
+.br
+qrrs "Something" /tmp/qr.png 
+.br
+qrrs \-r /tmp/qr.png 
+.br
+

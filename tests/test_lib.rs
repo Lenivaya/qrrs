@@ -1,17 +1,16 @@
-use qrrs::*;
-
-use rand::distributions::Alphanumeric;
-use rand::{thread_rng, Rng};
 use std::{fs, path::Path};
+
+mod test_common;
+use test_common::*;
 
 #[test]
 fn make_code() -> BoxResult<()> {
     let text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia desestartt mollit anim id est laborum.";
     let file = "qr_tmp_lorem.png";
 
-    let config = cli::Config {
-        input: Some(&text),
-        output: Some(file),
+    let config = cli::Arguments {
+        input: Some(text.to_string()),
+        output: Some(file.to_string()),
         read: false,
         terminal_output: false,
     };
@@ -19,7 +18,7 @@ fn make_code() -> BoxResult<()> {
     app.start();
 
     let path = Path::new(file);
-    let text_from_qr = App::read(&path)?.join(" ");
+    let text_from_qr = App::read(path)?.join(" ");
     fs::remove_file(file)?;
 
     assert_eq!(text, text_from_qr);
@@ -30,16 +29,12 @@ fn make_code() -> BoxResult<()> {
 #[test]
 fn make_code_with_random_text() -> BoxResult<()> {
     for _ in 0..10 {
-        let text: String = thread_rng()
-            .sample_iter(&Alphanumeric)
-            .take(30)
-            .map(char::from)
-            .collect();
+        let text: String = random_text();
         let file = "qr_tmp_random.png";
 
-        let config = cli::Config {
-            input: Some(&text),
-            output: Some(file),
+        let config = cli::Arguments {
+            input: Some(text.to_string()),
+            output: Some(file.to_string()),
             read: false,
             terminal_output: false,
         };
@@ -47,7 +42,7 @@ fn make_code_with_random_text() -> BoxResult<()> {
         app.start();
 
         let path = Path::new(file);
-        let text_from_qr = App::read(&path)?.join(" ");
+        let text_from_qr = App::read(path)?.join(" ");
         fs::remove_file(file)?;
 
         assert_eq!(text, text_from_qr);
@@ -75,14 +70,10 @@ fn save_in_unsuported_extesion() {
 #[test]
 #[should_panic]
 fn read_non_existent_file() {
-    let file: String = thread_rng()
-        .sample_iter(&Alphanumeric)
-        .take(40)
-        .map(char::from)
-        .collect();
+    let file: String = random_text();
     let path = Path::new(&file);
 
-    let _ = App::read(&path).unwrap();
+    let _ = App::read(path).unwrap();
 }
 
 #[test]
@@ -104,9 +95,9 @@ fn different_languages_support() -> BoxResult<()> {
     let file = "qr_tmp.png";
 
     for hello in hellos.iter() {
-        let config = cli::Config {
-            input: Some(hello),
-            output: Some(file),
+        let config = cli::Arguments {
+            input: Some(hello.to_string()),
+            output: Some(file.to_string()),
             read: false,
             terminal_output: false,
         };
@@ -114,7 +105,7 @@ fn different_languages_support() -> BoxResult<()> {
         app.start();
 
         let path = Path::new(file);
-        let hello_from_qr = App::read(&path)?.join(" ");
+        let hello_from_qr = App::read(path)?.join(" ");
 
         assert_eq!(*hello, hello_from_qr);
     }

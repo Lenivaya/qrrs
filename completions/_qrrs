@@ -1,0 +1,37 @@
+#compdef qrrs
+
+autoload -U is-at-least
+
+_qrrs() {
+    typeset -A opt_args
+    typeset -a _arguments_options
+    local ret=1
+
+    if is-at-least 5.2; then
+        _arguments_options=(-s -S -C)
+    else
+        _arguments_options=(-s -C)
+    fi
+
+    local context curcontext="$curcontext" state line
+    _arguments "${_arguments_options[@]}" \
+'-h[Print help information]' \
+'--help[Print help information]' \
+'-V[Print version information]' \
+'--version[Print version information]' \
+'-r[Reads the qr-code instead of generating it]' \
+'--read[Reads the qr-code instead of generating it]' \
+'-t[Displays code in terminal]' \
+'--terminal[Displays code in terminal]' \
+':INPUT -- Input data:_files' \
+'::OUTPUT -- Output file:_files' \
+&& ret=0
+}
+
+(( $+functions[_qrrs_commands] )) ||
+_qrrs_commands() {
+    local commands; commands=()
+    _describe -t commands 'qrrs commands' commands "$@"
+}
+
+_qrrs "$@"

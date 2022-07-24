@@ -24,7 +24,7 @@ image = "0.23"
 clap = { version = "3.2", features = ["derive", "cargo", "unicode", "wrap_help"] }
 
 [dev-dependencies]
-rand = "0.8.4"
+rand = "0.8.5"
 predicates = "2"
 assert_cmd = "2"
 

@@ -41,11 +41,11 @@ pub struct Arguments {
     )]
     pub output: Option<String>,
 
-    /// Reads the qr-code instead of generating it
+    /// Read the qr-code instead of generating it
     #[clap(name = "read", short, long)]
     pub read: bool,
 
-    /// Displays code in terminal
+    /// Display code in terminal
     #[clap(name = "terminal", short, long)]
     pub terminal_output: bool,
 }

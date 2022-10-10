@@ -15,14 +15,14 @@ _qrrs() {
 
     local context curcontext="$curcontext" state line
     _arguments "${_arguments_options[@]}" \
+'-r[Read the qr-code instead of generating it]' \
+'--read[Read the qr-code instead of generating it]' \
+'-t[Display code in terminal]' \
+'--terminal[Display code in terminal]' \
 '-h[Print help information]' \
 '--help[Print help information]' \
 '-V[Print version information]' \
 '--version[Print version information]' \
-'-r[Reads the qr-code instead of generating it]' \
-'--read[Reads the qr-code instead of generating it]' \
-'-t[Displays code in terminal]' \
-'--terminal[Displays code in terminal]' \
 ':INPUT -- Input data:_files' \
 '::OUTPUT -- Output file:_files' \
 && ret=0

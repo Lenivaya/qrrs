@@ -1,5 +1,5 @@
-use clap::{App, IntoApp, ValueEnum};
 use clap_complete::{generate_to, Shell};
+use clap::{Command, CommandFactory};
 use clap_mangen::Man;
 
 use roff::{line_break, roman, Roff};
@@ -54,7 +54,7 @@ fn generate_completions(cli: &mut App, outdir: &PathBuf) -> Res {
     Ok(())
 }
 
-fn generate_manpage(cli: App, outdir: &PathBuf) -> Res {
+fn generate_manpage(cli: Command, outdir: &PathBuf) -> Res {
     let mut buffer: Vec<u8> = Default::default();
 
     let man_file = outdir.join("qrrs.1");

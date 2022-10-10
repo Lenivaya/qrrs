@@ -8,8 +8,8 @@ _qrrs() {
 
     for i in ${COMP_WORDS[@]}
     do
-        case "${i}" in
-            "$1")
+        case "${cmd},${i}" in
+            ",$1")
                 cmd="qrrs"
                 ;;
             *)
@@ -19,7 +19,7 @@ _qrrs() {
 
     case "${cmd}" in
         qrrs)
-            opts="-h -V -r -t --help --version --read --terminal <INPUT> <OUTPUT>"
+            opts="-r -t -h -V --read --terminal --help --version <INPUT> [OUTPUT]"
             if [[ ${cur} == -* || ${COMP_CWORD} -eq 1 ]] ; then
                 COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
                 return 0

@@ -21,14 +21,14 @@ Register-ArgumentCompleter -Native -CommandName 'qrrs' -ScriptBlock {
 
     $completions = @(switch ($command) {
         'qrrs' {
+            [CompletionResult]::new('-r', 'r', [CompletionResultType]::ParameterName, 'Read the qr-code instead of generating it')
+            [CompletionResult]::new('--read', 'read', [CompletionResultType]::ParameterName, 'Read the qr-code instead of generating it')
+            [CompletionResult]::new('-t', 't', [CompletionResultType]::ParameterName, 'Display code in terminal')
+            [CompletionResult]::new('--terminal', 'terminal', [CompletionResultType]::ParameterName, 'Display code in terminal')
             [CompletionResult]::new('-h', 'h', [CompletionResultType]::ParameterName, 'Print help information')
             [CompletionResult]::new('--help', 'help', [CompletionResultType]::ParameterName, 'Print help information')
             [CompletionResult]::new('-V', 'V', [CompletionResultType]::ParameterName, 'Print version information')
             [CompletionResult]::new('--version', 'version', [CompletionResultType]::ParameterName, 'Print version information')
-            [CompletionResult]::new('-r', 'r', [CompletionResultType]::ParameterName, 'Reads the qr-code instead of generating it')
-            [CompletionResult]::new('--read', 'read', [CompletionResultType]::ParameterName, 'Reads the qr-code instead of generating it')
-            [CompletionResult]::new('-t', 't', [CompletionResultType]::ParameterName, 'Displays code in terminal')
-            [CompletionResult]::new('--terminal', 'terminal', [CompletionResultType]::ParameterName, 'Displays code in terminal')
             break
         }
     })

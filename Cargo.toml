@@ -12,16 +12,20 @@ license = "MIT"
 edition = "2018"
 
 [profile.release]
-lto = true
-opt-level = 'z'
+# lto = true
+lto = "fat"
+opt-level = "z"
 codegen-units = 1
 panic = 'abort'
+[profile.release.package."*"]
+opt-level = "z"
+codegen-units = 1
 
 [dependencies]
 qrcode = "0.12.0"
 rqrr = "0.4.0"
 image = "0.23"
-clap = { version = "3.2", features = ["derive", "cargo", "unicode", "wrap_help"] }
+clap = { version = "4.0", features = ["derive", "cargo", "unicode", "wrap_help"] }
 
 [dev-dependencies]
 rand = "0.8.4"
@@ -29,7 +33,7 @@ predicates = "2"
 assert_cmd = "2"
 
 [build-dependencies]
-clap = "3.2"
-clap_complete = "3.2"
-clap_mangen = "0.1"
+clap = "4.0"
+clap_complete = "4.0"
+clap_mangen = "0.2"
 roff = "0.2.1"

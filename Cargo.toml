@@ -12,10 +12,14 @@ license = "MIT"
 edition = "2018"
 
 [profile.release]
-lto = true
-opt-level = 'z'
+# lto = true
+lto = "fat"
+opt-level = "z"
 codegen-units = 1
 panic = 'abort'
+[profile.release.package."*"]
+opt-level = "z"
+codegen-units = 1
 
 [dependencies]
 qrcode = "0.12.0"

@@ -4,6 +4,7 @@
 
 ![CI](https://github.com/Lenivaya/qrrs/workflows/CI/badge.svg)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
+[![codecov](https://codecov.io/gh/Lenivaya/qrrs/branch/master/graph/badge.svg?token=UBGW1EV2GV)](https://codecov.io/gh/Lenivaya/qrrs)
 <a href="https://crates.io/crates/qrrs"><img src="https://img.shields.io/crates/v/qrrs.svg?colorB=319e8c" alt="Version info"></a><br>
 
 # Info

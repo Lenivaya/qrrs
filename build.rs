@@ -1,5 +1,8 @@
-use clap_complete::{generate_to, Shell};
 use clap::{Command, CommandFactory};
+use clap_complete::{
+    generate_to,
+    Shell::{Bash, Fish, PowerShell, Zsh},
+};
 use clap_mangen::Man;
 
 use roff::{line_break, roman, Roff};
@@ -37,11 +40,9 @@ fn main() -> Res {
     Ok(())
 }
 
-fn generate_completions(cli: &mut App, outdir: &PathBuf) -> Res {
-    ["bash", "zsh", "fish", "powershell"]
-        .iter()
-        .map(|sh| Shell::from_str(sh, true))
-        .filter_map(|sh| sh.ok())
+fn generate_completions(cli: &mut Command, outdir: &PathBuf) -> Res {
+    vec![Bash, Zsh, Fish, PowerShell]
+        .into_iter()
         .for_each(|sh| {
             let path = generate_to(sh, cli, "qrrs", &outdir);
 

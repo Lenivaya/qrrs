@@ -11,8 +11,8 @@ fn failures_wiithout_argumnents() -> BoxResult<()> {
 
     cmd.assert()
         .failure()
-        .stderr(str::contains("For more information try --help"))
-        .stderr(str::contains("USAGE:"));
+        .stderr(str::contains("Usage:"))
+        .stderr(str::contains("For more information try '--help'"));
 
     Ok(())
 }
@@ -25,9 +25,9 @@ fn wrong_arguments() -> BoxResult<()> {
 
     cmd.assert()
         .failure()
-        .stderr(str::contains("For more information try --help"))
+        .stderr(str::contains("For more information try '--help'"))
         .stderr(str::contains("wasn't expected"))
-        .stderr(str::contains("USAGE:"));
+        .stderr(str::contains("Usage:"));
 
     Ok(())
 }

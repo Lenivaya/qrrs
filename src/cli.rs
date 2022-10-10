@@ -20,7 +20,7 @@ Examples:
     about,
     version,
     after_help = AFTER_TEXT,
-    color = ColorChoice::Always
+    // color = ColorChoice::Always
 )]
 pub struct Arguments {
     /// Input data

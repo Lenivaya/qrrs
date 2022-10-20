@@ -1,4 +1,4 @@
-use clap::{ColorChoice, Parser, ValueHint};
+use clap::{Parser, ValueHint};
 
 const AFTER_TEXT: &str = "
 Examples:
@@ -19,8 +19,7 @@ Examples:
     author,
     about,
     version,
-    after_help = AFTER_TEXT,
-    // color = ColorChoice::Always
+    after_help = AFTER_TEXT
 )]
 pub struct Arguments {
     /// Input data

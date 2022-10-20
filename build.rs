@@ -7,7 +7,11 @@ use clap_mangen::Man;
 
 use roff::{line_break, roman, Roff};
 
-use std::{env, error::Error, path::PathBuf};
+use std::{
+    env,
+    error::Error,
+    path::{Path, PathBuf},
+};
 
 include!("src/cli.rs");
 
@@ -40,11 +44,11 @@ fn main() -> Res {
     Ok(())
 }
 
-fn generate_completions(cli: &mut Command, outdir: &PathBuf) -> Res {
+fn generate_completions(cli: &mut Command, outdir: &Path) -> Res {
     vec![Bash, Zsh, Fish, PowerShell]
         .into_iter()
         .for_each(|sh| {
-            let path = generate_to(sh, cli, "qrrs", &outdir);
+            let path = generate_to(sh, cli, "qrrs", outdir);
 
             println!(
                 "cargo:warning=completion file for {:?} is generated: {:?}",
@@ -55,7 +59,7 @@ fn generate_completions(cli: &mut Command, outdir: &PathBuf) -> Res {
     Ok(())
 }
 
-fn generate_manpage(cli: Command, outdir: &PathBuf) -> Res {
+fn generate_manpage(cli: Command, outdir: &Path) -> Res {
     let mut buffer: Vec<u8> = Default::default();
 
     let man_file = outdir.join("qrrs.1");

@@ -29,7 +29,7 @@ clap = { version = "4.0", features = ["derive", "cargo", "unicode", "wrap_help"]
 
 [dev-dependencies]
 rand = "0.8.4"
-predicates = "2"
+predicates = "3"
 assert_cmd = "2"
 
 [build-dependencies]

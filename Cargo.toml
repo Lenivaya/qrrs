@@ -34,6 +34,6 @@ assert_cmd = "2"
 
 [build-dependencies]
 clap = "4.0"
-clap_complete = "4.0"
+clap_complete = "4.1"
 clap_mangen = "0.2"
 roff = "0.2.1"

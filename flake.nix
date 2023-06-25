@@ -41,6 +41,8 @@
             cargo
             cargo-tarpaulin
             cargo-edit
+
+            clippy
           ];
 
           RUST_BACKTRACE = 1;
@@ -55,6 +57,7 @@
             programs = {
               alejandra.enable = true;
               rustfmt.enable = true;
+              prettier.enable = true;
             };
           };
       }

@@ -14,19 +14,27 @@ jobs:
   format:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions-rs/toolchain@v1
+      - uses: actions/checkout@v3
+      #  - uses: actions-rs/toolchain@v1
+      #     with:
+      #       toolchain: nightly
+      #       components: rustfmt, clippy
+      #       override: true
+
+      - uses: cachix/install-nix-action@v22
         with:
-          toolchain: nightly
-          components: rustfmt, clippy
-          override: true
+          github_access_token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Setup environment
+        run: nix develop
+
+      - name: Format project source code
+        run: nix fmt
 
       - uses: actions-rs/clippy-check@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           args: --all-features
 
-      - uses: mbrobbel/rustfmt-check@master
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-
+      # - uses: mbrobbel/rustfmt-check@master
+      #   with:
+      #     token: ${{ secrets.GITHUB_TOKEN }}

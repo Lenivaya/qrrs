@@ -24,17 +24,11 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      # - uses: actions-rs/toolchain@v1
-      #   with:
-      #     toolchain: stable
-      #     profile: minimal
-      #     override: true
-
-      - uses: cachix/install-nix-action@v22
+      - uses: actions-rs/toolchain@v1
         with:
-          github_access_token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Setup environment
-        run: nix develop
+          toolchain: stable
+          profile: minimal
+          override: true
 
       - name: Test
         uses: actions-rs/cargo@v1
@@ -47,10 +41,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      # - uses: actions-rs/toolchain@v1
-      #   with:
-      #     toolchain: nightly
-      #     override: true
 
       - uses: cachix/install-nix-action@v22
         with:

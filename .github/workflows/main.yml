@@ -39,3 +39,9 @@ jobs:
       # - uses: mbrobbel/rustfmt-check@master
       #   with:
       #     token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Commit formatting changes
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: Apply formatting changes
+          status_options: "--untracked-files=no"

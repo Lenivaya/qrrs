@@ -19,10 +19,10 @@ _qrrs() {
 '--read[Read the qr-code instead of generating it]' \
 '-t[Display code in terminal]' \
 '--terminal[Display code in terminal]' \
-'-h[Print help information]' \
-'--help[Print help information]' \
-'-V[Print version information]' \
-'--version[Print version information]' \
+'-h[Print help]' \
+'--help[Print help]' \
+'-V[Print version]' \
+'--version[Print version]' \
 ':INPUT -- Input data:_files' \
 '::OUTPUT -- Output file:_files' \
 && ret=0
@@ -34,4 +34,8 @@ _qrrs_commands() {
     _describe -t commands 'qrrs commands' commands "$@"
 }
 
-_qrrs "$@"
+if [ "$funcstack[1]" = "_qrrs" ]; then
+    _qrrs "$@"
+else
+    compdef _qrrs qrrs
+fi

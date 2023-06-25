@@ -12,7 +12,7 @@ fn failures_wiithout_argumnents() -> BoxResult<()> {
     cmd.assert()
         .failure()
         .stderr(str::contains("Usage:"))
-        .stderr(str::contains("For more information try '--help'"));
+        .stderr(str::contains("For more information, try '--help'."));
 
     Ok(())
 }
@@ -25,8 +25,7 @@ fn wrong_arguments() -> BoxResult<()> {
 
     cmd.assert()
         .failure()
-        .stderr(str::contains("For more information try '--help'"))
-        .stderr(str::contains("wasn't expected"))
+        .stderr(str::contains("error: unexpected argument '-d' found"))
         .stderr(str::contains("Usage:"));
 
     Ok(())
@@ -60,8 +59,7 @@ fn file_doesnt_exits() -> BoxResult<()> {
     let mut cmd = Command::cargo_bin("qrrs")?;
 
     let wrong_path_unix = str::contains("No such file or directory");
-    let wrong_path_windows =
-        str::contains("The system cannot find the path specified");
+    let wrong_path_windows = str::contains("The system cannot find the path specified");
 
     cmd.arg("-r").arg("/test/file/doesnt/exist/qr.png");
 

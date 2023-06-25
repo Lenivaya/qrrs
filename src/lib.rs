@@ -9,8 +9,8 @@ use std::sync::Arc;
 use std::thread;
 
 use image::Luma;
-use qrcode::render::unicode;
-use qrcode::QrCode;
+use qrencode::render::unicode;
+use qrencode::QrCode;
 use rqrr::PreparedImage;
 
 pub type BoxResult<T> = Result<T, Box<dyn Error>>;
@@ -113,9 +113,8 @@ impl App {
         let file = Path::new(input);
         let data = App::read(file)?;
 
-        for something in data {
-            println!("{}", something)
-        }
+        data.into_iter()
+            .for_each(|something| println!("{}", something));
 
         Ok(())
     }
@@ -143,13 +142,13 @@ impl App {
         let data = App::read(file)?.join(" ");
 
         let code = Arc::new(App::make_code(&data)?);
-        let codepointer = code.clone();
+        let code_pointer = code.clone();
 
         let print_handle = thread::spawn(move || {
             App::print_code_to_term(&code);
         });
 
-        App::save(output, &codepointer)?;
+        App::save(output, &code_pointer)?;
         print_handle.join().unwrap();
 
         Ok(())
@@ -160,15 +159,13 @@ impl App {
         let output = Path::new(&output);
 
         let data = Arc::new(App::read(input)?);
-        let datapointer = data.clone();
+        let data_pointer = data.clone();
 
         let print_handle = thread::spawn(move || {
-            for something in data.iter() {
-                println!("{}", something)
-            }
+            data.iter().for_each(|something| println!("{}", something));
         });
 
-        let data_to_write = datapointer.join("");
+        let data_to_write = data_pointer.join("");
         let code = App::make_code(&data_to_write)?;
 
         App::save(output, &code)?;
@@ -181,13 +178,13 @@ impl App {
         let output = Path::new(&output);
 
         let code = Arc::new(App::make_code(input)?);
-        let codepointer = code.clone();
+        let code_pointer = code.clone();
 
         let print_handle = thread::spawn(move || {
             App::print_code_to_term(&code);
         });
 
-        App::save(output, &codepointer)?;
+        App::save(output, &code_pointer)?;
         print_handle.join().unwrap();
 
         Ok(())
@@ -211,17 +208,17 @@ impl App {
         let mut prepared_img = PreparedImage::prepare(img);
 
         let grids = prepared_img.detect_grids();
-        let contents = grids
+        let contents: Vec<String> = grids
             .into_iter()
             .map(|grid| {
-                let (_, content) = grid.decode().unwrap_or_else(|err| {
-                    eprintln!("\nERROR reading data from qr code: {}", err);
-                    panic!();
-                });
-
-                content
+                grid.decode()
+                    .map(|(_, content)| content)
+                    .unwrap_or_else(|err| {
+                        eprintln!("\nERROR reading data from qr code: {}", err);
+                        panic!();
+                    })
             })
-            .collect::<Vec<String>>();
+            .collect();
 
         Ok(contents)
     }

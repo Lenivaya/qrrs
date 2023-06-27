@@ -9,23 +9,24 @@ readme = "README.md"
 keywords = ["cli", "qrcode", "qr", "decoder", "parser"]
 categories = ["command-line-utilities", "encoding", "parsing"]
 license = "MIT"
-edition = "2018"
+edition = "2021"
 
 [profile.release]
 # lto = true
+debug = false
 lto = "fat"
 opt-level = "z"
 codegen-units = 1
-panic = 'abort'
+panic = 'unwind'
 [profile.release.package."*"]
 opt-level = "z"
 codegen-units = 1
 
 [dependencies]
+clap = { version = "4.3", features = ["derive", "cargo", "unicode", "wrap_help"] }
 qrencode = "0.14.0"
 rqrr = "0.6.0"
 image = "0.24"
-clap = { version = "4.3", features = ["derive", "cargo", "unicode", "wrap_help"] }
 
 [dev-dependencies]
 rand = "0.8.5"
@@ -33,7 +34,7 @@ predicates = "3"
 assert_cmd = "2"
 
 [build-dependencies]
-clap = "4.3"
+clap = { version = "4.3", features = ["derive", "cargo", "unicode", "wrap_help"] }
 clap_complete = "4.3"
 clap_mangen = "0.2"
 roff = "0.2.1"

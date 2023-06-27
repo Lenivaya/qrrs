@@ -15,6 +15,8 @@ _qrrs() {
 
     local context curcontext="$curcontext" state line
     _arguments "${_arguments_options[@]}" \
+'-o+[Format in which the qrcode will be saved]:FORMAT:(image svg)' \
+'--output-format=[Format in which the qrcode will be saved]:FORMAT:(image svg)' \
 '-r[Read the qr-code instead of generating it]' \
 '--read[Read the qr-code instead of generating it]' \
 '-t[Display code in terminal]' \

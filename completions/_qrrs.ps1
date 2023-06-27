@@ -21,6 +21,8 @@ Register-ArgumentCompleter -Native -CommandName 'qrrs' -ScriptBlock {
 
     $completions = @(switch ($command) {
         'qrrs' {
+            [CompletionResult]::new('-o', 'o', [CompletionResultType]::ParameterName, 'Format in which the qrcode will be saved')
+            [CompletionResult]::new('--output-format', 'output-format', [CompletionResultType]::ParameterName, 'Format in which the qrcode will be saved')
             [CompletionResult]::new('-r', 'r', [CompletionResultType]::ParameterName, 'Read the qr-code instead of generating it')
             [CompletionResult]::new('--read', 'read', [CompletionResultType]::ParameterName, 'Read the qr-code instead of generating it')
             [CompletionResult]::new('-t', 't', [CompletionResultType]::ParameterName, 'Display code in terminal')

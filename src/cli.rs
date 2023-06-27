@@ -1,4 +1,5 @@
-use clap::{Parser, ValueHint};
+use clap::{command, Parser, ValueEnum, ValueHint};
+use std::io::{self, Read};
 
 const AFTER_TEXT: &str = "
 Examples:
@@ -14,16 +15,16 @@ Examples:
 ";
 
 #[derive(Parser, Debug)]
-#[clap(
+#[command(
     name = "qrrs",
     author,
     about,
     version,
-    after_help = AFTER_TEXT
+    after_help = AFTER_TEXT,
 )]
 pub struct Arguments {
     /// Input data
-    #[clap(
+    #[arg(
         name = "INPUT",
         value_hint = ValueHint::AnyPath,
         required(true),
@@ -32,7 +33,7 @@ pub struct Arguments {
     pub input: Option<String>,
 
     /// Output file
-    #[clap(
+    #[arg(
         name = "OUTPUT",
         value_hint = ValueHint::AnyPath,
         required_unless_present_any(["INPUT", "read", "terminal"]),
@@ -41,10 +42,48 @@ pub struct Arguments {
     pub output: Option<String>,
 
     /// Read the qr-code instead of generating it
-    #[clap(name = "read", short, long)]
+    #[arg(name = "read", short, long)]
     pub read: bool,
 
     /// Display code in terminal
-    #[clap(name = "terminal", short, long)]
+    #[arg(name = "terminal", short, long)]
     pub terminal_output: bool,
+
+    /// Format in which the qrcode will be saved
+    #[arg(
+        short('o'),
+        long,
+        value_enum,
+        default_value_t,
+        value_name("FORMAT"),
+        ignore_case(true)
+    )]
+    pub output_format: OutputFormat,
+}
+
+#[derive(Clone, Debug, Default, Eq, PartialEq, ValueEnum)]
+pub enum OutputFormat {
+    #[default]
+    Image,
+    Svg,
+}
+
+impl Arguments {
+    pub fn parse_cli_args() -> Arguments {
+        let args = Arguments::parse();
+        let input = args
+            .input
+            .and_then(|parsed_input| match parsed_input.as_str() {
+                "-" => Arguments::parse_stdin(),
+                _ => Some(parsed_input),
+            });
+
+        Arguments { input, ..args }
+    }
+
+    fn parse_stdin() -> Option<String> {
+        let mut buf = Vec::new();
+        io::stdin().read_to_end(&mut buf).ok();
+        String::from_utf8(buf).ok()
+    }
 }

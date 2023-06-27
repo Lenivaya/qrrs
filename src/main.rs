@@ -1,9 +1,8 @@
-use clap::Parser;
 use qrrs::{cli, App};
 
 fn main() {
-    let args = cli::Arguments::parse();
-
+    let args = cli::Arguments::parse_cli_args();
     let app = App::new(args);
+
     app.start();
 }

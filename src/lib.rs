@@ -1,27 +1,26 @@
 pub mod cli;
+pub mod errors;
+pub mod qrcode;
 
-use cli::Arguments;
+use cli::{Arguments, OutputFormat};
+use errors::BoxResult;
 
-use std::error::Error;
 use std::panic;
 use std::path::Path;
+use std::str;
 use std::sync::Arc;
 use std::thread;
-
-use image::Luma;
-use qrencode::render::unicode;
-use qrencode::QrCode;
-use rqrr::PreparedImage;
-
-pub type BoxResult<T> = Result<T, Box<dyn Error>>;
 
 #[derive(Debug)]
 pub struct App {
     args: Arguments,
 }
 
-// Methods
 impl App {
+    pub fn new(args: Arguments) -> Self {
+        App { args }
+    }
+
     pub fn start(self) {
         // Removing output(especially backtrace) when invoking panic
         panic::set_hook(Box::new(|_| {}));
@@ -40,7 +39,8 @@ impl App {
                 output: Some(o),
                 read: false,
                 terminal_output: false,
-            } => self.save_code(i, o)?,
+                output_format: of,
+            } => self.save_code(i, o, of),
 
             // Reads code and shows it in terminal
             Arguments {
@@ -48,7 +48,8 @@ impl App {
                 output: None,
                 read: true,
                 terminal_output: true,
-            } => self.print_code(i)?,
+                ..
+            } => self.print_code(i),
 
             // Reads code and shows it in terminal,
             // also saves to specified output
@@ -57,7 +58,8 @@ impl App {
                 output: Some(o),
                 read: true,
                 terminal_output: true,
-            } => self.save_print_code(i, o)?,
+                output_format: of,
+            } => self.read_print_save_code(i, o, of),
 
             // Reads qr code, also saves it to specified output
             Arguments {
@@ -65,7 +67,9 @@ impl App {
                 output: Some(o),
                 read: true,
                 terminal_output: false,
-            } => self.save_read_code(i, o)?,
+                output_format: of,
+                ..
+            } => self.read_save_code(i, o, of),
 
             // Reads qr code
             Arguments {
@@ -73,7 +77,7 @@ impl App {
                 read: true,
                 terminal_output: false,
                 ..
-            } => self.read_code(i)?,
+            } => self.read_code(i),
 
             // Prints code generated from user input to a terminal,
             // also saves it to specified output
@@ -82,164 +86,116 @@ impl App {
                 output: Some(o),
                 read: false,
                 terminal_output: true,
-            } => self.save_gen_print_code(i, o)?,
+                output_format: of,
+                ..
+            } => self.generate_print_save_code(i, o, of),
 
             /*
             Prints code generated from user input to a terminal
-            default behaviour with only an input available
+            default behavior with only an input available
             */
             Arguments {
                 input: Some(i),
                 output: None,
                 read: false,
                 ..
-            } => self.gen_print_code(i)?,
+            } => self.generate_print_code(i),
 
-            _ => unreachable!(),
+            _ => Ok(()),
         }
-
-        Ok(())
     }
 
-    fn save_code(&self, input: &str, output: &str) -> BoxResult<()> {
-        let code = App::make_code(input)?;
+    fn save_code(&self, input: &str, output: &str, output_format: &OutputFormat) -> BoxResult<()> {
+        let code = qrcode::make_code(input)?;
         let file = Path::new(output);
-        App::save(file, &code)?;
-
-        Ok(())
+        qrcode::save(file, &code, output_format)
     }
 
     fn read_code(&self, input: &str) -> BoxResult<()> {
         let file = Path::new(input);
-        let data = App::read(file)?;
+        let data = qrcode::read_data_image(file)?;
 
-        data.into_iter()
-            .for_each(|something| println!("{}", something));
-
-        Ok(())
+        Ok(data
+            .into_iter()
+            .for_each(|something| println!("{}", something)))
     }
 
     fn print_code(&self, input: &str) -> BoxResult<()> {
         let file = Path::new(input);
-        let data = App::read(file)?.join(" ");
+        let data = qrcode::read_data_image(file)?.join(" ");
 
-        let code = App::make_code(&data)?;
-        App::print_code_to_term(&code);
-
-        Ok(())
+        let code = qrcode::make_code(&data)?;
+        Ok(qrcode::print_code_to_term(&code))
     }
 
-    fn gen_print_code(&self, input: &str) -> BoxResult<()> {
-        let code = App::make_code(input)?;
-        App::print_code_to_term(&code);
-
-        Ok(())
+    fn generate_print_code(&self, input: &str) -> BoxResult<()> {
+        let code = qrcode::make_code(input)?;
+        Ok(qrcode::print_code_to_term(&code))
     }
 
-    fn save_print_code(&self, input: &str, output: &str) -> BoxResult<()> {
+    fn read_print_save_code(
+        &self,
+        input: &str,
+        output: &str,
+        output_format: &OutputFormat,
+    ) -> BoxResult<()> {
         let file = Path::new(input);
         let output = Path::new(output);
-        let data = App::read(file)?.join(" ");
 
-        let code = Arc::new(App::make_code(&data)?);
-        let code_pointer = code.clone();
+        let data = qrcode::read_data_image(file)?.join(" ");
+        let code = Arc::new(qrcode::make_code(&data)?);
 
-        let print_handle = thread::spawn(move || {
-            App::print_code_to_term(&code);
+        let print_handle = thread::spawn({
+            let code = Arc::clone(&code);
+            move || qrcode::print_code_to_term(&code)
         });
 
-        App::save(output, &code_pointer)?;
+        qrcode::save(output, &code, output_format)?;
         print_handle.join().unwrap();
 
         Ok(())
     }
 
-    fn save_read_code(&self, input: &str, output: &str) -> BoxResult<()> {
+    fn read_save_code(
+        &self,
+        input: &str,
+        output: &str,
+        output_format: &OutputFormat,
+    ) -> BoxResult<()> {
         let input = Path::new(&input);
         let output = Path::new(&output);
+        let data = Arc::new(qrcode::read_data_image(input)?);
 
-        let data = Arc::new(App::read(input)?);
-        let data_pointer = data.clone();
-
-        let print_handle = thread::spawn(move || {
-            data.iter().for_each(|something| println!("{}", something));
+        let print_handle = thread::spawn({
+            let data = Arc::clone(&data);
+            move || data.iter().for_each(|something| println!("{}", something))
         });
 
-        let data_to_write = data_pointer.join("");
-        let code = App::make_code(&data_to_write)?;
+        let data_to_write = data.join("");
+        let code = qrcode::make_code(&data_to_write)?;
 
-        App::save(output, &code)?;
+        qrcode::save(output, &code, output_format)?;
         print_handle.join().unwrap();
 
         Ok(())
     }
 
-    fn save_gen_print_code(&self, input: &str, output: &str) -> BoxResult<()> {
-        let output = Path::new(&output);
+    fn generate_print_save_code(
+        &self,
+        input: &str,
+        output: &str,
+        output_format: &OutputFormat,
+    ) -> BoxResult<()> {
+        let output = Path::new(output);
+        let code = Arc::new(qrcode::make_code(input)?);
 
-        let code = Arc::new(App::make_code(input)?);
-        let code_pointer = code.clone();
-
-        let print_handle = thread::spawn(move || {
-            App::print_code_to_term(&code);
+        let print_handle = thread::spawn({
+            let code = Arc::clone(&code);
+            move || qrcode::print_code_to_term(&code)
         });
 
-        App::save(output, &code_pointer)?;
+        qrcode::save(output, &code, output_format)?;
         print_handle.join().unwrap();
-
-        Ok(())
-    }
-}
-
-// Associated functions
-impl App {
-    pub fn new(args: Arguments) -> Self {
-        App { args }
-    }
-
-    pub fn make_code(data: &str) -> BoxResult<QrCode> {
-        let code = QrCode::new(data.as_bytes())?;
-
-        Ok(code)
-    }
-
-    pub fn read(file: &Path) -> BoxResult<Vec<String>> {
-        let img = image::open(file)?.to_luma8();
-        let mut prepared_img = PreparedImage::prepare(img);
-
-        let grids = prepared_img.detect_grids();
-        let contents: Vec<String> = grids
-            .into_iter()
-            .map(|grid| {
-                grid.decode()
-                    .map(|(_, content)| content)
-                    .unwrap_or_else(|err| {
-                        eprintln!("\nERROR reading data from qr code: {}", err);
-                        panic!();
-                    })
-            })
-            .collect();
-
-        Ok(contents)
-    }
-
-    pub fn print_code_to_term(code: &QrCode) {
-        let image = code
-            .render::<unicode::Dense1x2>()
-            .dark_color(unicode::Dense1x2::Light)
-            .light_color(unicode::Dense1x2::Dark)
-            .build();
-
-        println!("\n{}", image);
-    }
-
-    pub fn save(file: &Path, code: &QrCode) -> BoxResult<()> {
-        let image = code.render::<Luma<u8>>().build();
-        image.save(file).unwrap_or_else(|err| {
-            eprintln!("\nERROR: {}", err);
-            std::fs::remove_file(file).unwrap();
-            panic!();
-        });
 
         Ok(())
     }

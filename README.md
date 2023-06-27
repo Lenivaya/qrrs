@@ -96,6 +96,16 @@ Almost the same result will be without terminal flag, but now instead of QrCode 
 $ qrrs --read /tmp/qr.png /tmp/qr1.png
 ```
 
+### Create code using pipeline
+
+Use "**-**" to signalize passing data via stdin.
+
+```console
+$ echo "something" | qrrs - /tmp/something.png
+$ qrrs -r /tmp/something.png
+something
+```
+
 ## Install
 
 ### From crates.io

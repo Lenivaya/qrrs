@@ -1,5 +1,6 @@
 use assert_cmd::Command;
 use predicates::{prelude::*, str};
+use qrrs::errors::BoxResult;
 use std::{fs, path::Path};
 
 mod test_common;
@@ -32,25 +33,15 @@ fn wrong_arguments() -> BoxResult<()> {
 }
 
 #[test]
-fn reads_qr_code() -> BoxResult<()> {
-    let file = "qr_random_text.png";
-    let path = Path::new(file);
-    let text: String = thread_rng()
-        .sample_iter(&Alphanumeric)
-        .take(30)
-        .map(char::from)
-        .collect();
+fn creates_reads_qr_code() -> BoxResult<()> {
+    let supported_extensions = ["png", "jpeg", "bmp", "tiff", "tga"];
 
-    let code = App::make_code(&text)?;
-    App::save(path, &code)?;
+    for ext in supported_extensions {
+        if let Some(path) = Path::new("qr_random_text").with_extension(ext).to_str() {
+            create_read_code(path)?;
+        };
+    }
 
-    let mut cmd = Command::cargo_bin("qrrs")?;
-
-    cmd.arg("-r").arg(file);
-
-    cmd.assert().success().stdout(str::contains(text));
-
-    fs::remove_file(file)?;
     Ok(())
 }
 
@@ -67,5 +58,24 @@ fn file_doesnt_exits() -> BoxResult<()> {
         .failure()
         .stderr(wrong_path_unix.or(wrong_path_windows));
 
+    Ok(())
+}
+
+fn create_read_code(file_path: &str) -> BoxResult<()> {
+    let path = Path::new(file_path);
+    let text: String = thread_rng()
+        .sample_iter(&Alphanumeric)
+        .take(30)
+        .map(char::from)
+        .collect();
+
+    let code = qrcode::make_code(&text)?;
+    qrcode::save(path, &code, &cli::OutputFormat::Image)?;
+
+    let mut cmd = Command::cargo_bin("qrrs")?;
+    cmd.arg("-r").arg(file_path);
+    cmd.assert().success().stdout(str::contains(text));
+
+    fs::remove_file(file_path)?;
     Ok(())
 }

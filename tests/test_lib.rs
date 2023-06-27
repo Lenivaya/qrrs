@@ -1,6 +1,7 @@
 use std::{fs, path::Path};
 
 mod test_common;
+use qrrs::errors::BoxResult;
 use test_common::*;
 
 #[test]
@@ -13,12 +14,13 @@ fn make_code() -> BoxResult<()> {
         output: Some(file.to_string()),
         read: false,
         terminal_output: false,
+        output_format: cli::OutputFormat::Image,
     };
     let app = App::new(config);
     app.start();
 
     let path = Path::new(file);
-    let text_from_qr = App::read(path)?.join(" ");
+    let text_from_qr = qrcode::read_data_image(path)?.join(" ");
     fs::remove_file(file)?;
 
     assert_eq!(text, text_from_qr);
@@ -37,12 +39,13 @@ fn make_code_with_random_text() -> BoxResult<()> {
             output: Some(file.to_string()),
             read: false,
             terminal_output: false,
+            output_format: cli::OutputFormat::Image,
         };
         let app = App::new(config);
         app.start();
 
         let path = Path::new(file);
-        let text_from_qr = App::read(path)?.join(" ");
+        let text_from_qr = qrcode::read_data_image(path)?.join(" ");
         fs::remove_file(file)?;
 
         assert_eq!(text, text_from_qr);
@@ -59,11 +62,11 @@ fn save_in_unsuported_extesion() {
         "css", "ts", "tar.gz", "go", "tex", "scss",
     ];
 
-    for ext in &unsupported_extensions {
+    for ext in unsupported_extensions {
         let path = Path::new("file").with_extension(ext);
-        let code = App::make_code("QRrs").unwrap();
+        let code = qrcode::make_code("QRrs").unwrap();
 
-        App::save(&path, &code).unwrap();
+        qrcode::save(&path, &code, &cli::OutputFormat::Image).unwrap();
     }
 }
 
@@ -73,7 +76,7 @@ fn read_non_existent_file() {
     let file: String = random_text();
     let path = Path::new(&file);
 
-    let _ = App::read(path).unwrap();
+    let _ = qrcode::read_data_image(path).unwrap();
 }
 
 #[test]
@@ -94,18 +97,19 @@ fn different_languages_support() -> BoxResult<()> {
     ];
     let file = "qr_tmp.png";
 
-    for hello in hellos.iter() {
+    for hello in hellos {
         let config = cli::Arguments {
             input: Some(hello.to_string()),
             output: Some(file.to_string()),
             read: false,
             terminal_output: false,
+            output_format: cli::OutputFormat::Image,
         };
         let app = App::new(config);
         app.start();
 
         let path = Path::new(file);
-        let hello_from_qr = App::read(path)?.join(" ");
+        let hello_from_qr = qrcode::read_data_image(path)?.join(" ");
 
         assert_eq!(*hello, hello_from_qr);
     }

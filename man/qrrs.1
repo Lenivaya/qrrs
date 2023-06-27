@@ -4,7 +4,7 @@
 .SH NAME
 qrrs \- CLI QR code generator and reader
 .SH SYNOPSIS
-\fBqrrs\fR [\fB\-r\fR|\fB\-\-read\fR] [\fB\-t\fR|\fB\-\-terminal\fR] [\fB\-h\fR|\fB\-\-help\fR] [\fB\-V\fR|\fB\-\-version\fR] <\fIINPUT\fR> [\fIOUTPUT\fR] 
+\fBqrrs\fR [\fB\-r\fR|\fB\-\-read\fR] [\fB\-t\fR|\fB\-\-terminal\fR] [\fB\-o\fR|\fB\-\-output\-format\fR] [\fB\-h\fR|\fB\-\-help\fR] [\fB\-V\fR|\fB\-\-version\fR] <\fIINPUT\fR> [\fIOUTPUT\fR] 
 .SH DESCRIPTION
 CLI QR code generator and reader
 .SH OPTIONS
@@ -14,6 +14,13 @@ Read the qr\-code instead of generating it
 .TP
 \fB\-t\fR, \fB\-\-terminal\fR
 Display code in terminal
+.TP
+\fB\-o\fR, \fB\-\-output\-format\fR=\fIFORMAT\fR [default: image]
+Format in which the qrcode will be saved
+.br
+
+.br
+[\fIpossible values: \fRimage, svg]
 .TP
 \fB\-h\fR, \fB\-\-help\fR
 Print help

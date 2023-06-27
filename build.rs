@@ -21,24 +21,12 @@ fn main() -> Res {
     let mut cli = Arguments::command();
 
     let profile = env::var("PROFILE")?;
-    match profile.as_str() {
-        "release" => {
-            let outdir_c = PathBuf::from("./completions");
-            let outdir_m = PathBuf::from("./man");
+    if let "release" = profile.as_str() {
+        let outdir_completions = PathBuf::from("./completions");
+        let outdir_manpage = PathBuf::from("./man");
 
-            generate_completions(&mut cli, &outdir_c)?;
-            generate_manpage(cli, &outdir_m)?;
-        }
-        // "debug" => {
-        //     let outdir = match env::var_os("OUT_DIR") {
-        //         None => return Ok(()),
-        //         Some(outdir) => PathBuf::from(outdir),
-        //     };
-
-        //     generate_completions(&mut cli, &outdir)?;
-        //     generate_manpage(cli, &outdir)?;
-        // }
-        _ => (),
+        generate_completions(&mut cli, &outdir_completions)?;
+        generate_manpage(cli, &outdir_manpage)?;
     }
 
     Ok(())

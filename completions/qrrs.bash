@@ -19,12 +19,20 @@ _qrrs() {
 
     case "${cmd}" in
         qrrs)
-            opts="-r -t -h -V --read --terminal --help --version <INPUT> [OUTPUT]"
+            opts="-r -t -o -h -V --read --terminal --output-format --help --version <INPUT> [OUTPUT]"
             if [[ ${cur} == -* || ${COMP_CWORD} -eq 1 ]] ; then
                 COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
                 return 0
             fi
             case "${prev}" in
+                --output-format)
+                    COMPREPLY=($(compgen -W "image svg" -- "${cur}"))
+                    return 0
+                    ;;
+                -o)
+                    COMPREPLY=($(compgen -W "image svg" -- "${cur}"))
+                    return 0
+                    ;;
                 *)
                     COMPREPLY=()
                     ;;

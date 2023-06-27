@@ -1,7 +1,10 @@
 {
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-    flake-utils.url = "github:numtide/flake-utils";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    flake-compat = {
+      url = "github:edolstra/flake-compat";
+      flake = false;
+    };
 
     naersk.url = "github:nix-community/naersk";
     naersk.inputs.nixpkgs.follows = "nixpkgs";
@@ -10,56 +13,60 @@
     treefmt-nix.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = {
-    self,
-    flake-utils,
-    naersk,
+  outputs = inputs @ {
     nixpkgs,
+    flake-parts,
+    naersk,
     treefmt-nix,
+    ...
   }:
-    flake-utils.lib.eachDefaultSystem (
-      system: let
-        pkgs = (import nixpkgs) {
-          inherit system;
-        };
+    flake-parts.lib.mkFlake {inherit inputs;}
+    {
+      imports = [
+        treefmt-nix.flakeModule
+      ];
 
+      systems = nixpkgs.lib.systems.flakeExposed;
+      perSystem = {
+        pkgs,
+        self',
+        ...
+      }: let
         naersk' = pkgs.callPackage naersk {};
-      in rec {
-        # For `nix build` & `nix run`:
-        defaultPackage = naersk'.buildPackage {
-          src = ./.;
-        };
+      in {
+        packages.default = naersk'.buildPackage {src = ./.;};
 
-        # For `nix develop` (optional, can be skipped):
-        devShell = pkgs.mkShell {
-          name = "qrrs";
+        devShells = {
+          default = pkgs.mkShell {
+            name = "qrrs-dev";
+            nativeBuildInputs = with pkgs; [
+              rustc
+              cargo
 
-          nativeBuildInputs = with pkgs; [
-            rustc
-            rustfmt
+              cargo-tarpaulin
+              cargo-edit
 
-            cargo
-            cargo-tarpaulin
-            cargo-edit
-
-            clippy
-          ];
-
-          RUST_BACKTRACE = 1;
-        };
-
-        formatter =
-          treefmt-nix.lib.mkWrapper
-          pkgs
-          {
-            projectRootFile = "flake.nix";
-
-            programs = {
-              alejandra.enable = true;
-              rustfmt.enable = true;
-              prettier.enable = true;
-            };
+              rustfmt
+              clippy
+            ];
+            RUST_BACKTRACE = 1;
           };
-      }
-    );
+
+          testing = pkgs.mkShell {
+            name = "qrrs-test";
+            nativeBuildInputs = [self'.packages.default];
+          };
+        };
+
+        treefmt = {
+          projectRootFile = "flake.nix";
+
+          programs = {
+            alejandra.enable = true;
+            rustfmt.enable = true;
+            prettier.enable = true;
+          };
+        };
+      };
+    };
 }

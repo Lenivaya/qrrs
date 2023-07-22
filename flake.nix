@@ -24,6 +24,7 @@
     {
       imports = [
         treefmt-nix.flakeModule
+        flake-parts.flakeModules.easyOverlay
       ];
 
       systems = nixpkgs.lib.systems.flakeExposed;
@@ -34,6 +35,10 @@
       }: let
         naersk' = pkgs.callPackage naersk {};
       in {
+        overlayAttrs = {
+          inherit (self'.packages) default;
+        };
+
         packages.default = naersk'.buildPackage {src = ./.;};
 
         devShells = {

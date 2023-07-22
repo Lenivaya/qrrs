@@ -113,6 +113,12 @@ something
 
 ## Install
 
+## Nix
+
+```console
+nix run github:Lenivaya/qrrs "your input"
+```
+
 ### From crates.io
 
 ```console

@@ -5,30 +5,6 @@ use qrrs::errors::BoxResult;
 use test_common::*;
 
 #[test]
-fn make_code() -> BoxResult<()> {
-    let text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia desestartt mollit anim id est laborum.";
-    let file = "qr_tmp_lorem.png";
-
-    let config = cli::Arguments {
-        input: Some(text.to_string()),
-        output: Some(file.to_string()),
-        read: false,
-        terminal_output: false,
-        output_format: cli::OutputFormat::Image,
-    };
-    let app = App::new(config);
-    app.start();
-
-    let path = Path::new(file);
-    let text_from_qr = qrcode::read_data_image(path)?.join(" ");
-    fs::remove_file(file)?;
-
-    assert_eq!(text, text_from_qr);
-
-    Ok(())
-}
-
-#[test]
 fn make_code_with_random_text() -> BoxResult<()> {
     for _ in 0..10 {
         let text: String = random_text();

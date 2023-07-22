@@ -52,6 +52,18 @@
             RUST_BACKTRACE = 1;
           };
 
+          coverage = pkgs.mkShell {
+            name = "qrrs-coverage";
+            nativeBuildInputs = with pkgs; [
+              rustc
+              cargo
+              cargo-tarpaulin
+            ];
+            shellHook = ''
+              cargo tarpaulin --out Xml
+            '';
+          };
+
           testing = pkgs.mkShell {
             name = "qrrs-test";
             nativeBuildInputs = [self'.packages.default];

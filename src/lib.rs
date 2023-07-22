@@ -51,8 +51,10 @@ impl App {
                 ..
             } => self.print_code(i),
 
-            // Reads code and shows it in terminal,
-            // also saves to specified output
+            /*
+            Reads code and shows it in terminal,
+            also saves to specified output
+            */
             Arguments {
                 input: Some(i),
                 output: Some(o),
@@ -79,8 +81,10 @@ impl App {
                 ..
             } => self.read_code(i),
 
-            // Prints code generated from user input to a terminal,
-            // also saves it to specified output
+            /*
+            Prints code generated from user input to a terminal,
+            also saves it to specified output
+            */
             Arguments {
                 input: Some(i),
                 output: Some(o),

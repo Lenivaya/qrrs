@@ -1,0 +1,10 @@
+[all]
+exclude-files=[
+    "build.rs",
+    "src/main.rs",
+    "src/cli.rs",
+    "tests/**/*",
+]
+
+coveralls = "coveralls_key"
+out = ["Html", "Xml"]

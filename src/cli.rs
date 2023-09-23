@@ -74,6 +74,7 @@ pub enum OutputFormat {
     #[default]
     Image,
     Svg,
+    Unicode,
 }
 
 impl Arguments {

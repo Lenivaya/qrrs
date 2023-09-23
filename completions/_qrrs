@@ -15,12 +15,14 @@ _qrrs() {
 
     local context curcontext="$curcontext" state line
     _arguments "${_arguments_options[@]}" \
-'-o+[Format in which the qrcode will be saved]:FORMAT:(image svg)' \
-'--output-format=[Format in which the qrcode will be saved]:FORMAT:(image svg)' \
-'-r[Read the qr-code instead of generating it]' \
-'--read[Read the qr-code instead of generating it]' \
+'-o+[Format in which the qrcode will be saved]:FORMAT:(image svg unicode)' \
+'--output-format=[Format in which the qrcode will be saved]:FORMAT:(image svg unicode)' \
+'--margin=[Margin applied to qrcode]:margin: ' \
+'-r[Read the qrcode instead of generating it]' \
+'--read[Read the qrcode instead of generating it]' \
 '-t[Display code in terminal]' \
 '--terminal[Display code in terminal]' \
+'--invert_colors[Invert qrcode colors]' \
 '-h[Print help]' \
 '--help[Print help]' \
 '-V[Print version]' \

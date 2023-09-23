@@ -111,6 +111,15 @@ $ qrrs -r /tmp/something.png
 something
 ```
 
+### Invert colors
+
+![image](https://github.com/Lenivaya/qrrs/assets/49302467/186e2501-8ef1-4728-9567-5b2013911ec0)
+
+### Create code specifying it's margin
+
+![image](https://github.com/Lenivaya/qrrs/assets/49302467/b98a7df7-171a-4707-b733-e095fa7da814)
+![image](https://github.com/Lenivaya/qrrs/assets/49302467/6be8fee9-a4a5-4855-b515-8649b68d8028)
+
 ## Install
 
 ## Nix

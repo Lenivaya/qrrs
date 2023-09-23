@@ -4,13 +4,13 @@
 .SH NAME
 qrrs \- CLI QR code generator and reader
 .SH SYNOPSIS
-\fBqrrs\fR [\fB\-r\fR|\fB\-\-read\fR] [\fB\-t\fR|\fB\-\-terminal\fR] [\fB\-o\fR|\fB\-\-output\-format\fR] [\fB\-h\fR|\fB\-\-help\fR] [\fB\-V\fR|\fB\-\-version\fR] <\fIINPUT\fR> [\fIOUTPUT\fR] 
+\fBqrrs\fR [\fB\-r\fR|\fB\-\-read\fR] [\fB\-t\fR|\fB\-\-terminal\fR] [\fB\-o\fR|\fB\-\-output\-format\fR] [\fB\-\-margin\fR] [\fB\-\-invert_colors\fR] [\fB\-h\fR|\fB\-\-help\fR] [\fB\-V\fR|\fB\-\-version\fR] <\fIINPUT\fR> [\fIOUTPUT\fR] 
 .SH DESCRIPTION
 CLI QR code generator and reader
 .SH OPTIONS
 .TP
 \fB\-r\fR, \fB\-\-read\fR
-Read the qr\-code instead of generating it
+Read the qrcode instead of generating it
 .TP
 \fB\-t\fR, \fB\-\-terminal\fR
 Display code in terminal
@@ -20,7 +20,13 @@ Format in which the qrcode will be saved
 .br
 
 .br
-[\fIpossible values: \fRimage, svg]
+[\fIpossible values: \fRimage, svg, unicode]
+.TP
+\fB\-\-margin\fR=\fImargin\fR [default: 5]
+Margin applied to qrcode
+.TP
+\fB\-\-invert_colors\fR
+Invert qrcode colors
 .TP
 \fB\-h\fR, \fB\-\-help\fR
 Print help

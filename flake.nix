@@ -53,6 +53,8 @@
 
               rustfmt
               clippy
+
+              act
             ];
             RUST_BACKTRACE = 1;
           };
@@ -69,6 +71,7 @@
           programs = {
             alejandra.enable = true;
             rustfmt.enable = true;
+            yamlfmt.enable = true;
             prettier.enable = true;
           };
         };

@@ -1,7 +1,7 @@
 use std::{fs, path::Path};
 
 mod test_common;
-use qrrs::errors::BoxResult;
+use qrrs::{cli::OutputFormat, errors::BoxResult, qrcode::ImageSaveArguments};
 use test_common::*;
 
 #[test]
@@ -16,6 +16,8 @@ fn make_code_with_random_text() -> BoxResult<()> {
             read: false,
             terminal_output: false,
             output_format: cli::OutputFormat::Image,
+            margin: 1,
+            invert_colors: false,
         };
         let app = App::new(config);
         app.start();
@@ -42,7 +44,18 @@ fn save_in_unsuported_extesion() {
         let path = Path::new("file").with_extension(ext);
         let code = qrcode::make_code("QRrs").unwrap();
 
-        qrcode::save(&path, &code, &cli::OutputFormat::Image).unwrap();
+        qrcode::save(
+            &path,
+            &code,
+            ImageSaveArguments {
+                output_format: &OutputFormat::Image,
+                view_arguments: qrcode::QrCodeViewArguments {
+                    margin: 1,
+                    invert_colors: false,
+                },
+            },
+        )
+        .unwrap();
     }
 }
 
@@ -80,6 +93,8 @@ fn different_languages_support() -> BoxResult<()> {
             read: false,
             terminal_output: false,
             output_format: cli::OutputFormat::Image,
+            margin: 1,
+            invert_colors: false,
         };
         let app = App::new(config);
         app.start();

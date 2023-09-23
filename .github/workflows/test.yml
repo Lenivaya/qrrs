@@ -49,12 +49,7 @@ jobs:
         run: nix develop
 
       - name: Generate coverage report
-        run: nix develop --command cargo tarpaulin --out Xml
-
-        # - name: Generate coverage report
-        #   uses: actions-rs/tarpaulin@v0.1
-        #   with:
-        #     version: "0.22.0"
+        run: nix develop --command cargo tarpaulin --out xml
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3

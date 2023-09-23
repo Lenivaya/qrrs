@@ -1,6 +1,6 @@
 use assert_cmd::Command;
 use predicates::{prelude::*, str};
-use qrrs::errors::BoxResult;
+use qrrs::{cli::OutputFormat, errors::BoxResult, qrcode::ImageSaveArguments};
 use std::{fs, path::Path};
 
 mod test_common;
@@ -70,7 +70,17 @@ fn create_read_code(file_path: &str) -> BoxResult<()> {
         .collect();
 
     let code = qrcode::make_code(&text)?;
-    qrcode::save(path, &code, &cli::OutputFormat::Image)?;
+    qrcode::save(
+        path,
+        &code,
+        ImageSaveArguments {
+            output_format: &OutputFormat::Image,
+            view_arguments: qrcode::QrCodeViewArguments {
+                margin: 1,
+                invert_colors: false,
+            },
+        },
+    )?;
 
     let mut cmd = Command::cargo_bin("qrrs")?;
     cmd.arg("-r").arg(file_path);

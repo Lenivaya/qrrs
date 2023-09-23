@@ -41,7 +41,7 @@ pub struct Arguments {
     )]
     pub output: Option<String>,
 
-    /// Read the qr-code instead of generating it
+    /// Read the qrcode instead of generating it
     #[arg(name = "read", short, long)]
     pub read: bool,
 
@@ -59,6 +59,14 @@ pub struct Arguments {
         ignore_case(true)
     )]
     pub output_format: OutputFormat,
+
+    /// Margin applied to qrcode
+    #[arg(name = "margin", long, default_value_t = 5)]
+    pub margin: u32,
+
+    /// Invert qrcode colors
+    #[arg(name = "invert_colors", long)]
+    pub invert_colors: bool,
 }
 
 #[derive(Clone, Debug, Default, Eq, PartialEq, ValueEnum)]

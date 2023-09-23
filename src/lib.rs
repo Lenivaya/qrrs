@@ -2,8 +2,9 @@ pub mod cli;
 pub mod errors;
 pub mod qrcode;
 
-use cli::{Arguments, OutputFormat};
+use cli::Arguments;
 use errors::BoxResult;
+use qrcode::QrCodeViewArguments;
 
 use std::panic;
 use std::path::Path;
@@ -39,8 +40,8 @@ impl App {
                 output: Some(o),
                 read: false,
                 terminal_output: false,
-                output_format: of,
-            } => self.save_code(i, o, of),
+                ..
+            } => self.save_code(i, o),
 
             // Reads code and shows it in terminal
             Arguments {
@@ -60,8 +61,8 @@ impl App {
                 output: Some(o),
                 read: true,
                 terminal_output: true,
-                output_format: of,
-            } => self.read_print_save_code(i, o, of),
+                ..
+            } => self.read_print_save_code(i, o),
 
             // Reads qr code, also saves it to specified output
             Arguments {
@@ -69,9 +70,8 @@ impl App {
                 output: Some(o),
                 read: true,
                 terminal_output: false,
-                output_format: of,
                 ..
-            } => self.read_save_code(i, o, of),
+            } => self.read_save_code(i, o),
 
             // Reads qr code
             Arguments {
@@ -90,9 +90,8 @@ impl App {
                 output: Some(o),
                 read: false,
                 terminal_output: true,
-                output_format: of,
                 ..
-            } => self.generate_print_save_code(i, o, of),
+            } => self.generate_print_save_code(i, o),
 
             /*
             Prints code generated from user input to a terminal
@@ -109,10 +108,10 @@ impl App {
         }
     }
 
-    fn save_code(&self, input: &str, output: &str, output_format: &OutputFormat) -> BoxResult<()> {
+    fn save_code(&self, input: &str, output: &str) -> BoxResult<()> {
         let code = qrcode::make_code(input)?;
         let file = Path::new(output);
-        qrcode::save(file, &code, output_format)
+        qrcode::save(file, &code, (&self.args).into())
     }
 
     fn read_code(&self, input: &str) -> BoxResult<()> {
@@ -129,43 +128,34 @@ impl App {
         let data = qrcode::read_data_image(file)?.join(" ");
 
         let code = qrcode::make_code(&data)?;
-        Ok(qrcode::print_code_to_term(&code))
+        Ok(qrcode::print_code_to_term(&code, (&self.args).into()))
     }
 
     fn generate_print_code(&self, input: &str) -> BoxResult<()> {
         let code = qrcode::make_code(input)?;
-        Ok(qrcode::print_code_to_term(&code))
+        Ok(qrcode::print_code_to_term(&code, (&self.args).into()))
     }
 
-    fn read_print_save_code(
-        &self,
-        input: &str,
-        output: &str,
-        output_format: &OutputFormat,
-    ) -> BoxResult<()> {
+    fn read_print_save_code(&self, input: &str, output: &str) -> BoxResult<()> {
         let file = Path::new(input);
         let output = Path::new(output);
 
         let data = qrcode::read_data_image(file)?.join(" ");
         let code = Arc::new(qrcode::make_code(&data)?);
+        let code_view: QrCodeViewArguments = (&self.args).into();
 
         let print_handle = thread::spawn({
             let code = Arc::clone(&code);
-            move || qrcode::print_code_to_term(&code)
+            move || qrcode::print_code_to_term(&code, code_view)
         });
 
-        qrcode::save(output, &code, output_format)?;
+        qrcode::save(output, &code, (&self.args).into())?;
         print_handle.join().unwrap();
 
         Ok(())
     }
 
-    fn read_save_code(
-        &self,
-        input: &str,
-        output: &str,
-        output_format: &OutputFormat,
-    ) -> BoxResult<()> {
+    fn read_save_code(&self, input: &str, output: &str) -> BoxResult<()> {
         let input = Path::new(&input);
         let output = Path::new(&output);
         let data = Arc::new(qrcode::read_data_image(input)?);
@@ -178,27 +168,23 @@ impl App {
         let data_to_write = data.join("");
         let code = qrcode::make_code(&data_to_write)?;
 
-        qrcode::save(output, &code, output_format)?;
+        qrcode::save(output, &code, (&self.args).into())?;
         print_handle.join().unwrap();
 
         Ok(())
     }
 
-    fn generate_print_save_code(
-        &self,
-        input: &str,
-        output: &str,
-        output_format: &OutputFormat,
-    ) -> BoxResult<()> {
+    fn generate_print_save_code(&self, input: &str, output: &str) -> BoxResult<()> {
         let output = Path::new(output);
         let code = Arc::new(qrcode::make_code(input)?);
+        let code_view: QrCodeViewArguments = (&self.args).into();
 
         let print_handle = thread::spawn({
             let code = Arc::clone(&code);
-            move || qrcode::print_code_to_term(&code)
+            move || qrcode::print_code_to_term(&code, code_view)
         });
 
-        qrcode::save(output, &code, output_format)?;
+        qrcode::save(output, &code, (&self.args).into())?;
         print_handle.join().unwrap();
 
         Ok(())

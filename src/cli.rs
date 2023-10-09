@@ -61,11 +61,11 @@ pub struct Arguments {
     pub output_format: OutputFormat,
 
     /// Margin applied to qrcode
-    #[arg(name = "margin", long, default_value_t = 5)]
+    #[arg(name = "margin", long, short = 'm', default_value_t = 5)]
     pub margin: u32,
 
     /// Invert qrcode colors
-    #[arg(name = "invert_colors", long)]
+    #[arg(name = "invert_colors", long, short = 'i')]
     pub invert_colors: bool,
 }
 

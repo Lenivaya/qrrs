@@ -19,7 +19,7 @@ _qrrs() {
 
     case "${cmd}" in
         qrrs)
-            opts="-r -t -o -h -V --read --terminal --output-format --margin --invert_colors --help --version <INPUT> [OUTPUT]"
+            opts="-r -t -o -m -i -h -V --read --terminal --output-format --margin --invert_colors --help --version <INPUT> [OUTPUT]"
             if [[ ${cur} == -* || ${COMP_CWORD} -eq 1 ]] ; then
                 COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
                 return 0
@@ -34,6 +34,10 @@ _qrrs() {
                     return 0
                     ;;
                 --margin)
+                    COMPREPLY=($(compgen -f "${cur}"))
+                    return 0
+                    ;;
+                -m)
                     COMPREPLY=($(compgen -f "${cur}"))
                     return 0
                     ;;

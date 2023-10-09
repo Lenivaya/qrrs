@@ -23,11 +23,13 @@ Register-ArgumentCompleter -Native -CommandName 'qrrs' -ScriptBlock {
         'qrrs' {
             [CompletionResult]::new('-o', 'o', [CompletionResultType]::ParameterName, 'Format in which the qrcode will be saved')
             [CompletionResult]::new('--output-format', 'output-format', [CompletionResultType]::ParameterName, 'Format in which the qrcode will be saved')
+            [CompletionResult]::new('-m', 'm', [CompletionResultType]::ParameterName, 'Margin applied to qrcode')
             [CompletionResult]::new('--margin', 'margin', [CompletionResultType]::ParameterName, 'Margin applied to qrcode')
             [CompletionResult]::new('-r', 'r', [CompletionResultType]::ParameterName, 'Read the qrcode instead of generating it')
             [CompletionResult]::new('--read', 'read', [CompletionResultType]::ParameterName, 'Read the qrcode instead of generating it')
             [CompletionResult]::new('-t', 't', [CompletionResultType]::ParameterName, 'Display code in terminal')
             [CompletionResult]::new('--terminal', 'terminal', [CompletionResultType]::ParameterName, 'Display code in terminal')
+            [CompletionResult]::new('-i', 'i', [CompletionResultType]::ParameterName, 'Invert qrcode colors')
             [CompletionResult]::new('--invert_colors', 'invert_colors', [CompletionResultType]::ParameterName, 'Invert qrcode colors')
             [CompletionResult]::new('-h', 'h', [CompletionResultType]::ParameterName, 'Print help')
             [CompletionResult]::new('--help', 'help', [CompletionResultType]::ParameterName, 'Print help')

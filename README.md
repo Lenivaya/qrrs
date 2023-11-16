@@ -128,6 +128,11 @@ something
 nix run github:Lenivaya/qrrs "your input"
 ```
 
+## NetBSD
+```console
+pkgin install qrrs
+```
+
 ### From crates.io
 
 ```console

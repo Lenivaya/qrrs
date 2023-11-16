@@ -129,6 +129,7 @@ nix run github:Lenivaya/qrrs "your input"
 ```
 
 ## NetBSD
+
 ```console
 pkgin install qrrs
 ```

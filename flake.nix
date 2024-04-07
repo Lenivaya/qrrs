@@ -11,6 +11,9 @@
 
     treefmt-nix.url = "github:numtide/treefmt-nix";
     treefmt-nix.inputs.nixpkgs.follows = "nixpkgs";
+
+    gitignore.url = "github:hercules-ci/gitignore.nix";
+    gitignore.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs = inputs @ {
@@ -18,6 +21,7 @@
     flake-parts,
     naersk,
     treefmt-nix,
+    gitignore,
     ...
   }:
     flake-parts.lib.mkFlake {inherit inputs;}
@@ -34,12 +38,14 @@
         ...
       }: let
         naersk' = pkgs.callPackage naersk {};
+        inherit (gitignore.lib) gitignoreSource;
+        src = gitignoreSource ./.;
       in {
         overlayAttrs = {
           inherit (self'.packages) default;
         };
 
-        packages.default = naersk'.buildPackage {src = ./.;};
+        packages.default = naersk'.buildPackage {inherit src;};
 
         devShells = {
           default = pkgs.mkShell {

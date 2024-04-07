@@ -1,0 +1,37 @@
+name: Push to trunk
+
+on:
+  push:
+    branches:
+      - master
+    tags-ignore: ["v[0-9]+.[0-9]+.[0-9]+*"]
+    paths:
+      - "**.rs"
+      - "Cargo*"
+      - ".github/workflows/**.yml"
+      - ".github/.codecov.yml"
+
+jobs:
+  code_coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@v10
+
+      - name: Run the Magic Nix Cache
+        uses: DeterminateSystems/magic-nix-cache-action@v4
+
+      - name: Setup environment
+        run: nix develop
+
+      - name: Generate coverage report
+        run: nix develop .#ci-tests --command cargo tarpaulin --out xml
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          verbose: true
+          fail_ci_if_error: true

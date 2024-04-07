@@ -30,7 +30,7 @@ jobs:
         uses: DeterminateSystems/magic-nix-cache-action@v4
 
       - name: Test
-        run: nix develop --command cargo test --verbose --all
+        run: nix develop .#ci-tests --command cargo test --verbose --all
 
   test_windows:
     runs-on: windows-latest
@@ -66,7 +66,7 @@ jobs:
         run: nix develop
 
       - name: Generate coverage report
-        run: nix develop --command cargo tarpaulin --out xml
+        run: nix develop .#ci-tests --command cargo tarpaulin --out xml
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3

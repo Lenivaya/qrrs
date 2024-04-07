@@ -52,14 +52,14 @@
             lib.optional stdenv.isDarwin libiconv;
         };
 
-        devShells = {
+        devShells = let
+          bareMinimum = with pkgs; [rustc cargo] ++ lib.optional stdenv.isDarwin libiconv;
+        in {
           default = pkgs.mkShell {
             name = "qrrs-dev";
             nativeBuildInputs = with pkgs;
-              [
-                rustc
-                cargo
-
+              bareMinimum
+              ++ [
                 cargo-tarpaulin
                 cargo-edit
 
@@ -67,9 +67,19 @@
                 clippy
 
                 act
-              ]
-              ++ lib.optional stdenv.isDarwin libiconv;
+              ];
             RUST_BACKTRACE = 1;
+          };
+
+          ci-tests = pkgs.mkShell {
+            name = "qrrs-ci";
+            nativeBuildInputs = bareMinimum ++ (with pkgs; [cargo-tarpaulin]);
+            RUST_BACKTRACE = 1;
+          };
+
+          ci-format = pkgs.mkShell {
+            name = "qrrs-ci-format";
+            nativeBuildInputs = bareMinimum ++ (with pkgs; [rustfmt clippy]);
           };
 
           testing = pkgs.mkShell {

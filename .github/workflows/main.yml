@@ -23,7 +23,7 @@ jobs:
         uses: DeterminateSystems/magic-nix-cache-action@v4
 
       - name: Setup environment
-        run: nix develop
+        run: nix develop .#ci-format
 
       - name: Format project source code
         run: nix fmt

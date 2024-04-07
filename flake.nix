@@ -35,6 +35,7 @@
       perSystem = {
         pkgs,
         self',
+        lib,
         ...
       }: let
         naersk' = pkgs.callPackage naersk {};
@@ -45,7 +46,11 @@
           inherit (self'.packages) default;
         };
 
-        packages.default = naersk'.buildPackage {inherit src;};
+        packages.default = naersk'.buildPackage {
+          inherit src;
+          buildInputs = with pkgs;
+            lib.optional stdenv.isDarwin darwin.libiconv;
+        };
 
         devShells = {
           default = pkgs.mkShell {

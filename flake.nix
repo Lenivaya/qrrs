@@ -49,24 +49,26 @@
         packages.default = naersk'.buildPackage {
           inherit src;
           buildInputs = with pkgs;
-            lib.optional stdenv.isDarwin darwin.libiconv;
+            lib.optional stdenv.isDarwin libiconv;
         };
 
         devShells = {
           default = pkgs.mkShell {
             name = "qrrs-dev";
-            nativeBuildInputs = with pkgs; [
-              rustc
-              cargo
+            nativeBuildInputs = with pkgs;
+              [
+                rustc
+                cargo
 
-              cargo-tarpaulin
-              cargo-edit
+                cargo-tarpaulin
+                cargo-edit
 
-              rustfmt
-              clippy
+                rustfmt
+                clippy
 
-              act
-            ];
+                act
+              ]
+              ++ lib.optional stdenv.isDarwin libiconv;
             RUST_BACKTRACE = 1;
           };
 

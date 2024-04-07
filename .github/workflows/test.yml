@@ -1,16 +1,12 @@
 name: Test
 
 on:
-  push:
-    branches:
-      - master
-    tags-ignore: ["v[0-9]+.[0-9]+.[0-9]+*"]
+  pull_request:
     paths:
       - "**.rs"
       - "Cargo*"
       - ".github/workflows/**.yml"
       - ".github/.codecov.yml"
-  pull_request:
     branches:
       - "*"
 

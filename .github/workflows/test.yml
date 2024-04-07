@@ -13,7 +13,6 @@ on:
   pull_request:
     branches:
       - "*"
-    tags-ignore: ["v[0-9]+.[0-9]+.[0-9]+*"]
 
 jobs:
   test:
@@ -24,17 +23,15 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          profile: minimal
-          override: true
+
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@v10
+
+      - name: Run the Magic Nix Cache
+        uses: DeterminateSystems/magic-nix-cache-action@v4
 
       - name: Test
-        uses: actions-rs/cargo@v1
-        with:
-          command: test
-          args: --verbose --all
+        run: nix develop --command cargo test --verbose --all
 
   code_coverage:
     needs: [test]
@@ -42,9 +39,12 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - uses: cachix/install-nix-action@v22
-        with:
-          github_access_token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@v10
+
+      - name: Run the Magic Nix Cache
+        uses: DeterminateSystems/magic-nix-cache-action@v4
+
       - name: Setup environment
         run: nix develop
 

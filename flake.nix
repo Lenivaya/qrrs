@@ -11,6 +11,9 @@
 
     treefmt-nix.url = "github:numtide/treefmt-nix";
     treefmt-nix.inputs.nixpkgs.follows = "nixpkgs";
+
+    gitignore.url = "github:hercules-ci/gitignore.nix";
+    gitignore.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs = inputs @ {
@@ -18,6 +21,7 @@
     flake-parts,
     naersk,
     treefmt-nix,
+    gitignore,
     ...
   }:
     flake-parts.lib.mkFlake {inherit inputs;}
@@ -31,32 +35,51 @@
       perSystem = {
         pkgs,
         self',
+        lib,
         ...
       }: let
         naersk' = pkgs.callPackage naersk {};
+        inherit (gitignore.lib) gitignoreSource;
+        src = gitignoreSource ./.;
       in {
         overlayAttrs = {
           inherit (self'.packages) default;
         };
 
-        packages.default = naersk'.buildPackage {src = ./.;};
+        packages.default = naersk'.buildPackage {
+          inherit src;
+          buildInputs = with pkgs;
+            lib.optional stdenv.isDarwin libiconv;
+        };
 
-        devShells = {
+        devShells = let
+          bareMinimum = with pkgs; [rustc cargo] ++ lib.optional stdenv.isDarwin libiconv;
+        in {
           default = pkgs.mkShell {
             name = "qrrs-dev";
-            nativeBuildInputs = with pkgs; [
-              rustc
-              cargo
+            nativeBuildInputs = with pkgs;
+              bareMinimum
+              ++ [
+                cargo-tarpaulin
+                cargo-edit
 
-              cargo-tarpaulin
-              cargo-edit
+                rustfmt
+                clippy
 
-              rustfmt
-              clippy
-
-              act
-            ];
+                act
+              ];
             RUST_BACKTRACE = 1;
+          };
+
+          ci-tests = pkgs.mkShell {
+            name = "qrrs-ci";
+            nativeBuildInputs = bareMinimum ++ (with pkgs; [cargo-tarpaulin]);
+            RUST_BACKTRACE = 1;
+          };
+
+          ci-format = pkgs.mkShell {
+            name = "qrrs-ci-format";
+            nativeBuildInputs = bareMinimum ++ (with pkgs; [rustfmt clippy]);
           };
 
           testing = pkgs.mkShell {

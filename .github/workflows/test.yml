@@ -13,43 +13,60 @@ on:
   pull_request:
     branches:
       - "*"
-    tags-ignore: ["v[0-9]+.[0-9]+.[0-9]+*"]
 
 jobs:
-  test:
+  test_unix:
     strategy:
       matrix:
-        platform: [ubuntu-latest, macos-latest, windows-latest]
+        platform: [ubuntu-latest, macos-latest]
     runs-on: ${{ matrix.platform }}
-
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          profile: minimal
-          override: true
+      - uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@v10
+
+      - name: Run the Magic Nix Cache
+        uses: DeterminateSystems/magic-nix-cache-action@v4
 
       - name: Test
+        run: nix develop .#ci-tests --command cargo test --verbose --all
+
+  test_windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          override: true
+
+      - name: Run tests
         uses: actions-rs/cargo@v1
         with:
           command: test
           args: --verbose --all
 
   code_coverage:
-    needs: [test]
+    needs: [test_unix, test_windows]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - uses: cachix/install-nix-action@v22
-        with:
-          github_access_token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@v10
+
+      - name: Run the Magic Nix Cache
+        uses: DeterminateSystems/magic-nix-cache-action@v4
+
       - name: Setup environment
         run: nix develop
 
       - name: Generate coverage report
-        run: nix develop --command cargo tarpaulin --out xml
+        run: nix develop .#ci-tests --command cargo tarpaulin --out xml
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3

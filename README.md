@@ -125,7 +125,7 @@ something
 ## Nix
 
 ```console
-nix run github:Lenivaya/qrrs "your input"
+nix run github:Lenivaya/qrrs -- "your input"
 ```
 
 ## NetBSD

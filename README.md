@@ -128,6 +128,27 @@ something
 nix run github:Lenivaya/qrrs -- "your input"
 ```
 
+### Using last version through overlay in nixos config
+
+Add this repository as an input to your flake:
+
+```nix
+nixpkgs.url = "nixpkgs/nixpkgs-unstable";
+qrrs = {
+  url = "github:lenivaya/qrrs";
+  inputs.nixpkgs.follows = "nixpkgs";
+};
+```
+
+Then use the overlay somewhere in your config:
+
+```nix
+{inputs, ...}: {
+  nixpkgs.overlays = [inputs.qrrs.overlays.default];
+  environment.systemPackages = with pkgs; [qrrs];
+}
+```
+
 ## NetBSD
 
 ```console

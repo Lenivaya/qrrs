@@ -1,10 +1,6 @@
 {
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    flake-compat = {
-      url = "github:edolstra/flake-compat";
-      flake = false;
-    };
 
     naersk.url = "github:nix-community/naersk";
     naersk.inputs.nixpkgs.follows = "nixpkgs";
@@ -43,14 +39,15 @@
         src = gitignoreSource ./.;
       in {
         overlayAttrs = {
-          inherit (self'.packages) default;
+          inherit (self'.packages) qrrs;
         };
 
-        packages.default = naersk'.buildPackage {
+        packages.qrrs = naersk'.buildPackage {
           inherit src;
           buildInputs = with pkgs;
             lib.optional stdenv.isDarwin libiconv;
         };
+        packages.default = self'.packages.qrrs;
 
         devShells = let
           bareMinimum = with pkgs; [rustc cargo] ++ lib.optional stdenv.isDarwin libiconv;

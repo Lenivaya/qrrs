@@ -43,14 +43,15 @@
         src = gitignoreSource ./.;
       in {
         overlayAttrs = {
-          inherit (self'.packages) default;
+          inherit (self'.packages) qrrs;
         };
 
-        packages.default = naersk'.buildPackage {
+        packages.qrrs = naersk'.buildPackage {
           inherit src;
           buildInputs = with pkgs;
             lib.optional stdenv.isDarwin libiconv;
         };
+        packages.default = self'.packages.qrrs;
 
         devShells = let
           bareMinimum = with pkgs; [rustc cargo] ++ lib.optional stdenv.isDarwin libiconv;

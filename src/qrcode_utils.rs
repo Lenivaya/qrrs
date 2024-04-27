@@ -1,17 +1,48 @@
-use crate::cli::{Arguments, OutputFormat};
+use crate::cli::args::{Arguments, OutputFormat};
 use crate::errors::BoxResult;
 
 use image::{DynamicImage, Rgba};
-use qrencode::render::{svg, unicode, Renderer};
-use qrencode::QrCode;
+use qrcode::render::{svg, unicode, Renderer};
+use qrcode::QrCode;
+use resvg::{
+    tiny_skia::{Pixmap, Transform},
+    usvg,
+};
 use rqrr::PreparedImage;
 
 use std::error::Error;
+use std::ffi::OsStr;
 use std::fs;
 use std::path::Path;
 
 pub fn make_code(data: &str) -> BoxResult<QrCode> {
     Ok(QrCode::new(data.as_bytes())?)
+}
+
+pub fn is_svg_path(path: &Path) -> bool {
+    matches!(
+        path.extension().and_then(OsStr::to_str),
+        Some("svg" | "svgz")
+    )
+}
+
+fn convert_svg_to_image_data(data: &[u8]) -> BoxResult<Vec<u8>> {
+    let options = usvg::Options::default();
+    let tree = usvg::Tree::from_data(data, &options)?;
+
+    let pixmap_size = tree.size().to_int_size();
+    let mut pixmap = Pixmap::new(pixmap_size.width(), pixmap_size.height()).unwrap();
+    resvg::render(&tree, Transform::default(), &mut pixmap.as_mut());
+    let png_data = pixmap.encode_png()?;
+
+    Ok(png_data)
+}
+
+/// Converts SVG data to an image.
+fn convert_svg_to_image(input: &[u8]) -> BoxResult<image::DynamicImage> {
+    let svg_img = convert_svg_to_image_data(input)?;
+    let img = image::load_from_memory_with_format(&svg_img, image::ImageFormat::Png)?;
+    Ok(img)
 }
 
 /// Renders the QR code into an SVG image.
@@ -57,11 +88,11 @@ pub fn print_code_to_term(code: &QrCode, view_arguments: QrCodeViewArguments) {
     println!("\n{}", to_unicode(code, view_arguments));
 }
 
-pub fn read_data_image(file: &Path) -> BoxResult<Vec<String>> {
-    let img = image::open(file)?.to_luma8();
-    let mut prepared_img = PreparedImage::prepare(img);
+/// Extracts qrcode data from image
+pub fn extract_contents_from_image(img: image::DynamicImage) -> Vec<String> {
+    let mut prepared_img = PreparedImage::prepare(img.to_luma8());
 
-    let contents = prepared_img
+    prepared_img
         .detect_grids()
         .into_iter()
         .map(|grid| {
@@ -72,9 +103,18 @@ pub fn read_data_image(file: &Path) -> BoxResult<Vec<String>> {
                     panic!();
                 })
         })
-        .collect();
+        .collect()
+}
 
-    Ok(contents)
+pub fn read_data_from_image(file: &Path) -> BoxResult<Vec<String>> {
+    let img = if is_svg_path(file) {
+        let input = fs::read(file)?;
+        convert_svg_to_image(&input)?
+    } else {
+        image::open(file)?
+    };
+
+    Ok(extract_contents_from_image(img))
 }
 
 pub fn save(file: &Path, code: &QrCode, image_save_args: ImageSaveArguments) -> BoxResult<()> {
@@ -94,6 +134,14 @@ fn save_unicode(file: &Path, code: &QrCode, view_arguments: QrCodeViewArguments)
 
 fn save_image(file: &Path, code: &QrCode, view_arguments: QrCodeViewArguments) -> BoxResult<()> {
     let image = to_image(code, view_arguments);
+
+    let image = match file.extension().and_then(OsStr::to_str) {
+        Some("jpg") | Some("jpeg") | Some("pbm") | Some("pgm") | Some("ppm") => {
+            DynamicImage::ImageRgb8(image.into_rgb8())
+        }
+        _ => image,
+    };
+
     image.save(file).map_err(|err| handle_save_error(file, err))
 }
 

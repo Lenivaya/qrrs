@@ -1,3 +1,5 @@
+include!("src/cli/args.rs");
+
 use clap::{Command, CommandFactory};
 use clap_complete::{
     generate_to,
@@ -12,8 +14,6 @@ use std::{
     error::Error,
     path::{Path, PathBuf},
 };
-
-include!("src/cli.rs");
 
 type Res = Result<(), Box<dyn Error>>;
 

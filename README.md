@@ -143,7 +143,10 @@ qrrs = {
 Then use the overlay somewhere in your config:
 
 ```nix
-{inputs, ...}: {nixpkgs.overlays = [inputs.qrrs.overlays.default];}
+{inputs, ...}: {
+  nixpkgs.overlays = [inputs.qrrs.overlays.default];
+  environment.systemPackages = with pkgs; [qrrs];
+}
 ```
 
 ## NetBSD

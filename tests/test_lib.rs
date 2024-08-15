@@ -1,12 +1,13 @@
 use std::{fs, path::Path};
 
-mod test_common;
 use qrrs::{
     cli::args::{Arguments, OutputFormat},
     errors::BoxResult,
     qrcode_utils::ImageSaveArguments,
 };
 use test_common::*;
+
+mod test_common;
 
 #[test]
 fn makes_code_with_random_text_for_different_extensions() -> BoxResult<()> {
@@ -31,6 +32,7 @@ fn makes_code_with_random_text_for_different_extensions() -> BoxResult<()> {
             output_format,
             margin: 1,
             invert_colors: false,
+            generate_completions: None,
         };
         let app = App::new(config);
         app.start();
@@ -108,6 +110,7 @@ fn different_languages_support() -> BoxResult<()> {
             output_format: OutputFormat::Image,
             margin: 1,
             invert_colors: false,
+            generate_completions: None,
         };
         let app = App::new(config);
         app.start();

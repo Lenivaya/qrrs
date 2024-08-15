@@ -143,7 +143,7 @@ qrrs = {
 Then use the overlay somewhere in your config:
 
 ```nix
-{inputs, ...}: {
+{inputs, pkgs, ...}: {
   nixpkgs.overlays = [inputs.qrrs.overlays.default];
   environment.systemPackages = with pkgs; [qrrs];
 }

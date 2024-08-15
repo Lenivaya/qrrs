@@ -1,5 +1,7 @@
-use crate::cli::args::{Arguments, OutputFormat};
-use crate::errors::BoxResult;
+use std::error::Error;
+use std::ffi::OsStr;
+use std::fs;
+use std::path::Path;
 
 use image::{DynamicImage, Rgba};
 use qrcode::render::{svg, unicode, Renderer};
@@ -10,10 +12,8 @@ use resvg::{
 };
 use rqrr::PreparedImage;
 
-use std::error::Error;
-use std::ffi::OsStr;
-use std::fs;
-use std::path::Path;
+use crate::cli::args::{Arguments, OutputFormat};
+use crate::errors::BoxResult;
 
 pub fn make_code(data: &str) -> BoxResult<QrCode> {
     Ok(QrCode::new(data.as_bytes())?)
@@ -39,10 +39,9 @@ fn convert_svg_to_image_data(data: &[u8]) -> BoxResult<Vec<u8>> {
 }
 
 /// Converts SVG data to an image.
-fn convert_svg_to_image(input: &[u8]) -> BoxResult<image::DynamicImage> {
+fn convert_svg_to_image(input: &[u8]) -> BoxResult<DynamicImage> {
     let svg_img = convert_svg_to_image_data(input)?;
-    let img = image::load_from_memory_with_format(&svg_img, image::ImageFormat::Png)?;
-    Ok(img)
+    image::load_from_memory_with_format(&svg_img, image::ImageFormat::Png).map_err(Into::into)
 }
 
 /// Renders the QR code into an SVG image.
@@ -89,7 +88,7 @@ pub fn print_code_to_term(code: &QrCode, view_arguments: QrCodeViewArguments) {
 }
 
 /// Extracts qrcode data from image
-pub fn extract_contents_from_image(img: image::DynamicImage) -> Vec<String> {
+pub fn extract_contents_from_image(img: DynamicImage) -> Vec<String> {
     let mut prepared_img = PreparedImage::prepare(img.to_luma8());
 
     prepared_img

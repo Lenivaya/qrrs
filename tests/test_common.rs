@@ -1,7 +1,7 @@
-pub use qrrs::*;
-
+pub use rand::{Rng, thread_rng};
 pub use rand::distributions::Alphanumeric;
-pub use rand::{thread_rng, Rng};
+
+pub use qrrs::*;
 
 pub fn random_text() -> String {
     thread_rng()

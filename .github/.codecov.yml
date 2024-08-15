@@ -2,6 +2,5 @@ coverage:
   range: 40..70
   round: up
   precision: 2
-
 ignore:
   - "src/main.rs"

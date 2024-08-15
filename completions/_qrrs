@@ -14,7 +14,7 @@ _qrrs() {
     fi
 
     local context curcontext="$curcontext" state line
-    _arguments "${_arguments_options[@]}" \
+    _arguments "${_arguments_options[@]}" : \
 '-o+[Format in which the qrcode will be saved]:FORMAT:(image svg unicode)' \
 '--output-format=[Format in which the qrcode will be saved]:FORMAT:(image svg unicode)' \
 '-m+[Margin applied to qrcode]:margin: ' \

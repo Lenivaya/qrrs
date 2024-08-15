@@ -28,11 +28,16 @@ impl App {
 
         if let Err(e) = self.run() {
             eprintln!("\nERROR: {}", e);
-            panic!();
+            std::process::exit(1);
         }
     }
 
     fn run(self) -> BoxResult<()> {
+        if let Some(shell) = self.args.generate_completions {
+            Arguments::generate_completions(shell);
+            return Ok(());
+        }
+
         match &self.args {
             // Saves qr code
             Arguments {
@@ -150,7 +155,7 @@ impl App {
         });
 
         qrcode_utils::save(output, &code, (&self.args).into())?;
-        print_handle.join().unwrap();
+        print_handle.join().expect("Failed to join threads");
 
         Ok(())
     }
@@ -169,7 +174,7 @@ impl App {
         let code = qrcode_utils::make_code(&data_to_write)?;
 
         qrcode_utils::save(output, &code, (&self.args).into())?;
-        print_handle.join().unwrap();
+        print_handle.join().expect("Failed to join threads");
 
         Ok(())
     }
@@ -185,7 +190,7 @@ impl App {
         });
 
         qrcode_utils::save(output, &code, (&self.args).into())?;
-        print_handle.join().unwrap();
+        print_handle.join().expect("Failed to join threads");
 
         Ok(())
     }

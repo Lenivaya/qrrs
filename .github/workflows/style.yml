@@ -1,5 +1,4 @@
 name: Style
-
 on:
   push:
     branches:
@@ -8,31 +7,24 @@ on:
   pull_request:
     branches:
       - "*"
-
 jobs:
   format:
     permissions: write-all
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - name: Install Nix
         uses: DeterminateSystems/nix-installer-action@v10
-
       - name: Run the Magic Nix Cache
         uses: DeterminateSystems/magic-nix-cache-action@v4
-
       - name: Setup environment
         run: nix develop .#ci-format
-
       - name: Format project source code
         run: nix fmt
-
       - uses: actions-rs/clippy-check@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           args: --all-features
-
       - name: Commit formatting changes
         uses: stefanzweifel/git-auto-commit-action@v4
         with:

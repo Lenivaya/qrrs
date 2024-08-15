@@ -1,4 +1,5 @@
 use clap::{command, Parser, ValueEnum, ValueHint};
+use clap_complete::Shell;
 
 const AFTER_TEXT: &str = "
 Examples:
@@ -26,7 +27,7 @@ pub struct Arguments {
     #[arg(
         name = "INPUT",
         value_hint = ValueHint::AnyPath,
-        required(true),
+        required_unless_present_any(["generate_completions"]),
         index(1)
     )]
     pub input: Option<String>,
@@ -35,7 +36,7 @@ pub struct Arguments {
     #[arg(
         name = "OUTPUT",
         value_hint = ValueHint::AnyPath,
-        required_unless_present_any(["INPUT", "read", "terminal"]),
+        required_unless_present_any(["INPUT", "read", "terminal", "generate_completions"]),
         index(2)
     )]
     pub output: Option<String>,
@@ -66,6 +67,10 @@ pub struct Arguments {
     /// Invert qrcode colors
     #[arg(name = "invert_colors", long, short = 'i')]
     pub invert_colors: bool,
+
+    /// Generate completion file for the specified shell
+    #[arg(long, value_enum, value_name("SHELL"))]
+    pub generate_completions: Option<Shell>,
 }
 
 #[derive(Clone, Debug, Default, Eq, PartialEq, ValueEnum)]

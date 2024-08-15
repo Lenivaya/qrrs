@@ -1,10 +1,12 @@
-use assert_cmd::Command;
-use predicates::{prelude::*, str};
-use qrrs::{cli::args::OutputFormat, errors::BoxResult, qrcode_utils::ImageSaveArguments};
 use std::{fs, path::Path};
 
-mod test_common;
+use assert_cmd::Command;
+use predicates::{prelude::*, str};
+
+use qrrs::{cli::args::OutputFormat, errors::BoxResult, qrcode_utils::ImageSaveArguments};
 use test_common::*;
+
+mod test_common;
 
 #[test]
 fn failures_without_arguments() -> BoxResult<()> {

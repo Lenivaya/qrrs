@@ -1,5 +1,4 @@
 name: Test
-
 on:
   pull_request:
     paths:
@@ -9,7 +8,6 @@ on:
       - ".github/.codecov.yml"
     branches:
       - "*"
-
 jobs:
   test_unix:
     strategy:
@@ -18,52 +16,40 @@ jobs:
     runs-on: ${{ matrix.platform }}
     steps:
       - uses: actions/checkout@v4
-
       - name: Install Nix
         uses: DeterminateSystems/nix-installer-action@v10
-
       - name: Run the Magic Nix Cache
         uses: DeterminateSystems/magic-nix-cache-action@v4
-
       - name: Test
         run: nix develop .#ci-tests --command cargo test --verbose --all
-
   test_windows:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
-
       - name: Install Rust
         uses: actions-rs/toolchain@v1
         with:
           profile: minimal
           toolchain: stable
           override: true
-
       - name: Run tests
         uses: actions-rs/cargo@v1
         with:
           command: test
           args: --verbose --all
-
   code_coverage:
     needs: [test_unix, test_windows]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - name: Install Nix
         uses: DeterminateSystems/nix-installer-action@v10
-
       - name: Run the Magic Nix Cache
         uses: DeterminateSystems/magic-nix-cache-action@v4
-
       - name: Setup environment
         run: nix develop
-
       - name: Generate coverage report
         run: nix develop .#ci-tests --command cargo tarpaulin --out xml
-
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
         with:

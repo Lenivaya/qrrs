@@ -1,6 +1,6 @@
 [package]
 name = "qrrs"
-version = "0.1.9"
+version = "0.1.10"
 authors = ["Lenivaya <danylo.osipchuk@proton.me>"]
 description = "CLI QR code generator and reader"
 homepage = "https://github.com/Lenivaya/qrrs"

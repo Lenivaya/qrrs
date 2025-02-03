@@ -19,7 +19,7 @@ _qrrs() {
 
     case "${cmd}" in
         qrrs)
-            opts="-r -t -o -m -i -h -V --read --terminal --output-format --margin --invert_colors --help --version <INPUT> [OUTPUT]"
+            opts="-r -t -o -m -i -e -h -V --read --terminal --output-format --margin --invert_colors --generate-completions --error-correction-level --help --version [INPUT] [OUTPUT]"
             if [[ ${cur} == -* || ${COMP_CWORD} -eq 1 ]] ; then
                 COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
                 return 0
@@ -39,6 +39,18 @@ _qrrs() {
                     ;;
                 -m)
                     COMPREPLY=($(compgen -f "${cur}"))
+                    return 0
+                    ;;
+                --generate-completions)
+                    COMPREPLY=($(compgen -W "bash elvish fish powershell zsh" -- "${cur}"))
+                    return 0
+                    ;;
+                --error-correction-level)
+                    COMPREPLY=($(compgen -W "low l medium m quartile q high h" -- "${cur}"))
+                    return 0
+                    ;;
+                -e)
+                    COMPREPLY=($(compgen -W "low l medium m quartile q high h" -- "${cur}"))
                     return 0
                     ;;
                 *)

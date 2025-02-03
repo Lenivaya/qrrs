@@ -5,7 +5,7 @@ use std::path::Path;
 
 use image::{DynamicImage, Rgba};
 use qrcode::render::{svg, unicode, Renderer};
-use qrcode::QrCode;
+use qrcode::{EcLevel, QrCode};
 use resvg::{
     tiny_skia::{Pixmap, Transform},
     usvg,
@@ -15,8 +15,11 @@ use rqrr::PreparedImage;
 use crate::cli::args::{Arguments, OutputFormat};
 use crate::errors::BoxResult;
 
-pub fn make_code(data: &str) -> BoxResult<QrCode> {
-    Ok(QrCode::new(data.as_bytes())?)
+pub fn make_code(data: &str, ec_level: EcLevel) -> BoxResult<QrCode> {
+    Ok(QrCode::with_error_correction_level(
+        data.as_bytes(),
+        ec_level,
+    )?)
 }
 
 pub fn is_svg_path(path: &Path) -> bool {

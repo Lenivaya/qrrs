@@ -1,10 +1,10 @@
 .ie \n(.g .ds Aq \(aq
 .el .ds Aq '
-.TH qrrs 1  "qrrs 0.1.9" 
+.TH qrrs 1  "qrrs 0.1.10" 
 .SH NAME
 qrrs \- CLI QR code generator and reader
 .SH SYNOPSIS
-\fBqrrs\fR [\fB\-r\fR|\fB\-\-read\fR] [\fB\-t\fR|\fB\-\-terminal\fR] [\fB\-o\fR|\fB\-\-output\-format\fR] [\fB\-m\fR|\fB\-\-margin\fR] [\fB\-i\fR|\fB\-\-invert_colors\fR] [\fB\-h\fR|\fB\-\-help\fR] [\fB\-V\fR|\fB\-\-version\fR] <\fIINPUT\fR> [\fIOUTPUT\fR] 
+\fBqrrs\fR [\fB\-r\fR|\fB\-\-read\fR] [\fB\-t\fR|\fB\-\-terminal\fR] [\fB\-o\fR|\fB\-\-output\-format\fR] [\fB\-m\fR|\fB\-\-margin\fR] [\fB\-i\fR|\fB\-\-invert_colors\fR] [\fB\-\-generate\-completions\fR] [\fB\-e\fR|\fB\-\-error\-correction\-level\fR] [\fB\-h\fR|\fB\-\-help\fR] [\fB\-V\fR|\fB\-\-version\fR] [\fIINPUT\fR] [\fIOUTPUT\fR] 
 .SH DESCRIPTION
 CLI QR code generator and reader
 .SH OPTIONS
@@ -28,13 +28,27 @@ Margin applied to qrcode
 \fB\-i\fR, \fB\-\-invert_colors\fR
 Invert qrcode colors
 .TP
+\fB\-\-generate\-completions\fR=\fISHELL\fR
+Generate completion file for the specified shell
+.br
+
+.br
+[\fIpossible values: \fRbash, elvish, fish, powershell, zsh]
+.TP
+\fB\-e\fR, \fB\-\-error\-correction\-level\fR=\fILEVEL\fR [default: medium]
+Error correction level for the QR code
+.br
+
+.br
+[\fIpossible values: \fRlow, l, medium, m, quartile, q, high, h]
+.TP
 \fB\-h\fR, \fB\-\-help\fR
 Print help
 .TP
 \fB\-V\fR, \fB\-\-version\fR
 Print version
 .TP
-<\fIINPUT\fR>
+[\fIINPUT\fR]
 Input data
 .TP
 [\fIOUTPUT\fR]
@@ -52,9 +66,9 @@ Examples:
   qrrs \-\-read /tmp/qr1.png
   Some text
 .SH VERSION
-v0.1.9
+v0.1.10
 .SH AUTHORS
-Lenivaya <xocada@gmail.com>
+Lenivaya <danylo.osipchuk@proton.me>
 .ie \n(.g .ds Aq \(aq
 .el .ds Aq '
 .SH "EXAMPLES OF USAGE"

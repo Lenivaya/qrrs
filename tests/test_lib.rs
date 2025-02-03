@@ -1,7 +1,8 @@
 use std::{fs, path::Path};
 
+use qrcode::EcLevel;
 use qrrs::{
-    cli::args::{Arguments, OutputFormat},
+    cli::args::{Arguments, CliEcLevel, OutputFormat},
     errors::BoxResult,
     qrcode_utils::ImageSaveArguments,
 };
@@ -32,6 +33,7 @@ fn makes_code_with_random_text_for_different_extensions() -> BoxResult<()> {
             output_format,
             margin: 1,
             invert_colors: false,
+            error_correction_level: CliEcLevel::Medium,
             generate_completions: None,
         };
         let app = App::new(config);
@@ -57,7 +59,7 @@ fn save_in_unsupported_extension() {
 
     for extension in unsupported_extensions {
         let path = Path::new("file").with_extension(extension);
-        let code = qrcode_utils::make_code("QRrs").unwrap();
+        let code = qrcode_utils::make_code("QRrs", EcLevel::M).unwrap();
 
         qrcode_utils::save(
             &path,
@@ -110,6 +112,7 @@ fn different_languages_support() -> BoxResult<()> {
             output_format: OutputFormat::Image,
             margin: 1,
             invert_colors: false,
+            error_correction_level: CliEcLevel::Medium,
             generate_completions: None,
         };
         let app = App::new(config);

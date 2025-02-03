@@ -71,6 +71,18 @@ pub struct Arguments {
     /// Generate completion file for the specified shell
     #[arg(long, value_enum, value_name("SHELL"))]
     pub generate_completions: Option<Shell>,
+
+    /// Error correction level for the QR code
+    #[arg(
+        name = "error-correction-level",
+        long,
+        short = 'e',
+        value_enum,
+        default_value_t = CliEcLevel::Medium,
+        value_name("LEVEL"),
+        ignore_case(true)
+    )]
+    pub error_correction_level: CliEcLevel,
 }
 
 #[derive(Clone, Debug, Default, Eq, PartialEq, ValueEnum)]
@@ -79,4 +91,17 @@ pub enum OutputFormat {
     Image,
     Svg,
     Unicode,
+}
+
+#[derive(Clone, Debug, Default, Eq, PartialEq, ValueEnum)]
+pub enum CliEcLevel {
+    #[default]
+    Low,
+    L,
+    Medium,
+    M,
+    Quartile,
+    Q,
+    High,
+    H,
 }

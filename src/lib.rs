@@ -2,8 +2,9 @@ pub mod cli;
 pub mod errors;
 pub mod qrcode_utils;
 
-use cli::args::Arguments;
+use cli::args::{Arguments, CliEcLevel};
 use errors::BoxResult;
+use qrcode::EcLevel;
 use qrcode_utils::QrCodeViewArguments;
 
 use std::panic;
@@ -45,8 +46,9 @@ impl App {
                 output: Some(o),
                 read: false,
                 terminal_output: false,
+                error_correction_level: ec,
                 ..
-            } => self.save_code(i, o),
+            } => self.save_code(i, ec.into(), o),
 
             // Reads code and shows it in terminal
             Arguments {
@@ -54,8 +56,9 @@ impl App {
                 output: None,
                 read: true,
                 terminal_output: true,
+                error_correction_level: ec,
                 ..
-            } => self.print_code(i),
+            } => self.print_code(i, ec.into()),
 
             /*
             Reads code and shows it in terminal,
@@ -66,8 +69,9 @@ impl App {
                 output: Some(o),
                 read: true,
                 terminal_output: true,
+                error_correction_level: ec,
                 ..
-            } => self.read_print_save_code(i, o),
+            } => self.read_print_save_code(i, ec.into(), o),
 
             // Reads qr code, also saves it to specified output
             Arguments {
@@ -75,8 +79,9 @@ impl App {
                 output: Some(o),
                 read: true,
                 terminal_output: false,
+                error_correction_level: ec,
                 ..
-            } => self.read_save_code(i, o),
+            } => self.read_save_code(i, ec.into(), o),
 
             // Reads qr code
             Arguments {
@@ -95,8 +100,9 @@ impl App {
                 output: Some(o),
                 read: false,
                 terminal_output: true,
+                error_correction_level: ec,
                 ..
-            } => self.generate_print_save_code(i, o),
+            } => self.generate_print_save_code(i, ec.into(), o),
 
             /*
             Prints code generated from user input to a terminal
@@ -106,15 +112,16 @@ impl App {
                 input: Some(i),
                 output: None,
                 read: false,
+                error_correction_level: ec,
                 ..
-            } => self.generate_print_code(i),
+            } => self.generate_print_code(i, ec.into()),
 
             _ => Ok(()),
         }
     }
 
-    fn save_code(&self, input: &str, output: &str) -> BoxResult<()> {
-        let code = qrcode_utils::make_code(input)?;
+    fn save_code(&self, input: &str, ec_level: EcLevel, output: &str) -> BoxResult<()> {
+        let code = qrcode_utils::make_code(input, ec_level)?;
         let file = Path::new(output);
         qrcode_utils::save(file, &code, (&self.args).into())
     }
@@ -128,25 +135,25 @@ impl App {
             .for_each(|something| println!("{}", something)))
     }
 
-    fn print_code(&self, input: &str) -> BoxResult<()> {
+    fn print_code(&self, input: &str, ec_level: EcLevel) -> BoxResult<()> {
         let file = Path::new(input);
         let data = qrcode_utils::read_data_from_image(file)?.join(" ");
 
-        let code = qrcode_utils::make_code(&data)?;
+        let code = qrcode_utils::make_code(&data, ec_level)?;
         Ok(qrcode_utils::print_code_to_term(&code, (&self.args).into()))
     }
 
-    fn generate_print_code(&self, input: &str) -> BoxResult<()> {
-        let code = qrcode_utils::make_code(input)?;
+    fn generate_print_code(&self, input: &str, ec_level: EcLevel) -> BoxResult<()> {
+        let code = qrcode_utils::make_code(input, ec_level)?;
         Ok(qrcode_utils::print_code_to_term(&code, (&self.args).into()))
     }
 
-    fn read_print_save_code(&self, input: &str, output: &str) -> BoxResult<()> {
+    fn read_print_save_code(&self, input: &str, ec_level: EcLevel, output: &str) -> BoxResult<()> {
         let file = Path::new(input);
         let output = Path::new(output);
 
         let data = qrcode_utils::read_data_from_image(file)?.join(" ");
-        let code = Arc::new(qrcode_utils::make_code(&data)?);
+        let code = Arc::new(qrcode_utils::make_code(&data, ec_level)?);
         let code_view: QrCodeViewArguments = (&self.args).into();
 
         let print_handle = thread::spawn({
@@ -160,7 +167,7 @@ impl App {
         Ok(())
     }
 
-    fn read_save_code(&self, input: &str, output: &str) -> BoxResult<()> {
+    fn read_save_code(&self, input: &str, ec_level: EcLevel, output: &str) -> BoxResult<()> {
         let input = Path::new(&input);
         let output = Path::new(&output);
         let data = Arc::new(qrcode_utils::read_data_from_image(input)?);
@@ -171,7 +178,7 @@ impl App {
         });
 
         let data_to_write = data.join("");
-        let code = qrcode_utils::make_code(&data_to_write)?;
+        let code = qrcode_utils::make_code(&data_to_write, ec_level)?;
 
         qrcode_utils::save(output, &code, (&self.args).into())?;
         print_handle.join().expect("Failed to join threads");
@@ -179,9 +186,14 @@ impl App {
         Ok(())
     }
 
-    fn generate_print_save_code(&self, input: &str, output: &str) -> BoxResult<()> {
+    fn generate_print_save_code(
+        &self,
+        input: &str,
+        ec_level: EcLevel,
+        output: &str,
+    ) -> BoxResult<()> {
         let output = Path::new(output);
-        let code = Arc::new(qrcode_utils::make_code(input)?);
+        let code = Arc::new(qrcode_utils::make_code(input, ec_level)?);
         let code_view: QrCodeViewArguments = (&self.args).into();
 
         let print_handle = thread::spawn({
@@ -193,5 +205,16 @@ impl App {
         print_handle.join().expect("Failed to join threads");
 
         Ok(())
+    }
+}
+
+impl From<&CliEcLevel> for EcLevel {
+    fn from(level: &CliEcLevel) -> EcLevel {
+        match level {
+            CliEcLevel::Low | CliEcLevel::L => EcLevel::L,
+            CliEcLevel::Medium | CliEcLevel::M => EcLevel::M,
+            CliEcLevel::Quartile | CliEcLevel::Q => EcLevel::Q,
+            CliEcLevel::High | CliEcLevel::H => EcLevel::H,
+        }
     }
 }

@@ -19,6 +19,9 @@ _qrrs() {
 '--output-format=[Format in which the qrcode will be saved]:FORMAT:(image svg unicode)' \
 '-m+[Margin applied to qrcode]:margin: ' \
 '--margin=[Margin applied to qrcode]:margin: ' \
+'--generate-completions=[Generate completion file for the specified shell]:SHELL:(bash elvish fish powershell zsh)' \
+'-e+[Error correction level for the QR code]:LEVEL:(low l medium m quartile q high h)' \
+'--error-correction-level=[Error correction level for the QR code]:LEVEL:(low l medium m quartile q high h)' \
 '-r[Read the qrcode instead of generating it]' \
 '--read[Read the qrcode instead of generating it]' \
 '-t[Display code in terminal]' \
@@ -29,7 +32,7 @@ _qrrs() {
 '--help[Print help]' \
 '-V[Print version]' \
 '--version[Print version]' \
-':INPUT -- Input data:_files' \
+'::INPUT -- Input data:_files' \
 '::OUTPUT -- Output file:_files' \
 && ret=0
 }

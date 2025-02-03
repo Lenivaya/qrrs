@@ -3,6 +3,7 @@ use std::{fs, path::Path};
 use assert_cmd::Command;
 use predicates::{prelude::*, str};
 
+use qrcode::EcLevel;
 use qrrs::{cli::args::OutputFormat, errors::BoxResult, qrcode_utils::ImageSaveArguments};
 use test_common::*;
 
@@ -71,7 +72,7 @@ fn create_read_code(file_path: &str) -> BoxResult<()> {
         .map(char::from)
         .collect();
 
-    let code = qrcode_utils::make_code(&text)?;
+    let code = qrcode_utils::make_code(&text, EcLevel::M)?;
     qrcode_utils::save(
         path,
         &code,

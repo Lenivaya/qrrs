@@ -130,9 +130,9 @@ impl App {
         let file = Path::new(input);
         let data = qrcode_utils::read_data_from_image(file)?;
 
-        Ok(data
-            .into_iter()
-            .for_each(|something| println!("{}", something)))
+        data.into_iter()
+            .for_each(|something| println!("{}", something));
+        Ok(())
     }
 
     fn print_code(&self, input: &str, ec_level: EcLevel) -> BoxResult<()> {
@@ -140,12 +140,14 @@ impl App {
         let data = qrcode_utils::read_data_from_image(file)?.join(" ");
 
         let code = qrcode_utils::make_code(&data, ec_level)?;
-        Ok(qrcode_utils::print_code_to_term(&code, (&self.args).into()))
+        qrcode_utils::print_code_to_term(&code, (&self.args).into());
+        Ok(())
     }
 
     fn generate_print_code(&self, input: &str, ec_level: EcLevel) -> BoxResult<()> {
         let code = qrcode_utils::make_code(input, ec_level)?;
-        Ok(qrcode_utils::print_code_to_term(&code, (&self.args).into()))
+        qrcode_utils::print_code_to_term(&code, (&self.args).into());
+        Ok(())
     }
 
     fn read_print_save_code(&self, input: &str, ec_level: EcLevel, output: &str) -> BoxResult<()> {
